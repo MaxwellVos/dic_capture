@@ -25,7 +25,6 @@ PyWavelets==1.4.1
 PyYAML==6.0
 scikit-image==0.19.3
 scipy==1.9.3
-serial==0.0.97
 six==1.16.0
 tifffile==2022.10.10
 tzdata==2023.3

@@ -1,6 +1,6 @@
-#Author: Maxwell Vos
-#Date 01/2023
-#Capturing software used in custom DIC standalone system
+# Author: Maxwell Vos
+# Date 01/2023
+# Capturing software used in custom DIC standalone system
 import sys
 import time
 import serial
@@ -19,15 +19,14 @@ from time import sleep
 import easygui
 import os
 
-#Record mode simplifies the displays and saves all data
+# Record mode simplifies the displays and saves all data
 global record_mode
 record_mode = False
 
 global exposure_time_ms
 exposure_time_ms = 1.6
 
-
-#Size of the array that the camera loads the images into RAM. Only first image is displayed. Used to increase fps peformance.
+# Size of the array that the camera loads the images into RAM. Only first image is displayed. Used to increase fps peformance.
 global max_buffer_arr
 
 global test_ID
@@ -35,21 +34,21 @@ test_ID = ''
 
 if record_mode == True:
     # fpsValues = [0,0.25,1,32,1,0.2,0] # pin sequence for fps, iterates array index everytime quench 4 state is changed.
-    #fpsValues = [0, 1, 0.125, 0.125, 0, 0.125]  # Matthew Inconel RBDT
+    # fpsValues = [0, 1, 0.125, 0.125, 0, 0.125]  # Matthew Inconel RBDT
 
-    #fpsValues = [0, 0, 0.125, 0]  # use this for calibration image capture
-    fpsValues = [0, 0.125, 0.125, 0.125, 0, 0.125] #Matthew Inconel Testing
+    # fpsValues = [0, 0, 0.125, 0]  # use this for calibration image capture
+    fpsValues = [0, 0.125, 0.125, 0.125, 0, 0.125]  # Matthew Inconel Testing
 
     max_buffer_arr = 3
 
-    save_path  = easygui.diropenbox(
+    save_path = easygui.diropenbox(
         default='C:/Users/maxwe/OneDrive/Documents/Masters/Test_Data/Mathew DIC',
         title='Select an EMPTY folder as the save location for this test')
     print(save_path)
     test_ID = os.path.basename(os.path.normpath(save_path))
     print(test_ID)
     raw_data_save_dir = os.path.join(save_path, "Raw_Data")
-    os.mkdir(raw_data_save_dir,0o666)
+    os.mkdir(raw_data_save_dir, 0o666)
     cam_1_save_dir = os.path.join(save_path, "Camera_1")
     os.mkdir(cam_1_save_dir, 0o666)
     cam_2_save_dir = os.path.join(save_path, "Camera_2")
@@ -62,20 +61,21 @@ if record_mode == True:
     os.mkdir(DIC_results_save_dir, 0o666)
 else:
     max_buffer_arr = 3
-    fpsValues = [0,20,0]
+    fpsValues = [0, 20, 0]
     save_path = ''
     test_ID = ''
     raw_data_save_dir = ''
     cam_1_save_dir = ''
     cam_2_save_dir = ''
 
-cam1_src = 'P1-6' #'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
-cam2_src = 'P1-5' #'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
+cam1_src = 'P1-6'  # 'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
+cam2_src = 'P1-5'  # 'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
 
 ser = serial.Serial('COM4', 115200, timeout=2)
 
+
 def hardware_tigger():
-    #NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
+    # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
     sleep(1)
     TCTN1_Values = ''
     TCTN1_temp = ''
@@ -84,19 +84,20 @@ def hardware_tigger():
         if i == 0:
             TCTN1_temp = '0'
         else:
-            TCTN1_temp = str(round(65536- 16000000/(1024 * i*2)))  # converts frame rate to arduino clock overflow start value
-        TCTN1_Values = TCTN1_Values + TCTN1_temp + ', ' #adds this value to a string which will be sent to the arduino
-    TCTN1_Values = TCTN1_Values[: -2] #delets the ', ' from the end of the string befor sending
+            TCTN1_temp = str(
+                round(65536 - 16000000 / (1024 * i * 2)))  # converts frame rate to arduino clock overflow start value
+        TCTN1_Values = TCTN1_Values + TCTN1_temp + ', '  # adds this value to a string which will be sent to the arduino
+    TCTN1_Values = TCTN1_Values[: -2]  # delets the ', ' from the end of the string befor sending
 
     while True:
-        try: #reads serial output from audrino
+        try:  # reads serial output from audrino
             ser.write(TCTN1_Values.encode())
             qValue = ser.readline().strip().decode('ascii')
             print('serial output: ', qValue)
-            if qValue == "RECIEVED" and (record_mode == True ):
+            if qValue == "RECIEVED" and (record_mode == True):
                 with open(raw_data_save_dir + "/Arduino_Serial_Output_" + test_ID + '.txt', 'a') as f:
-                    heading_write_ard = 'Frame'+'\t'+'Time'+'\t'+'State'+'\t'+'Count'+'\t'+'Last_QTime'+'\n'
-                    f.write(heading_write_ard) #headings for .txt file output
+                    heading_write_ard = 'Frame' + '\t' + 'Time' + '\t' + 'State' + '\t' + 'Count' + '\t' + 'Last_QTime' + '\n'
+                    f.write(heading_write_ard)  # headings for .txt file output
                 break
         except:
             sleep(0.01)
@@ -104,7 +105,7 @@ def hardware_tigger():
     while (record_mode == True):
         try:
             while (ser.inWaiting() == 0):
-               pass
+                pass
             qValue = ser.read(ser.in_waiting)
 
             with open(raw_data_save_dir + "/Arduino_Serial_Output_" + test_ID + '.txt', 'a') as f:
@@ -113,12 +114,13 @@ def hardware_tigger():
         except:
             pass
 
+
 class vStream():
-    def __init__(self,src,windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir):
+    def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir):
         self.buffer_arr_max = buffer_arr_max
         self.timeOut_ms = timeOut_ms
         self.windowName = windowName
-        self.zoomWindowName = windowName+' Zoomed'
+        self.zoomWindowName = windowName + ' Zoomed'
         self.xPos = xPos
         self.yPos = yPos
         self.src = src
@@ -132,20 +134,20 @@ class vStream():
         self.camera.SetImageBufferCycleCount(10)
 
         self.camera.f.PixelFormat.SetString('Mono12')
-        self.camera.f.ExposureTime.Set(exposure_time_ms* 1000)
+        self.camera.f.ExposureTime.Set(exposure_time_ms * 1000)
         self.camera.f.TriggerMode = neoapi.TriggerMode_On
-        #self.camera.f.TriggerSource = neoapi.TriggerSource_Software
-        #self.camera.f.TriggerSoftware.Execute()
+        # self.camera.f.TriggerSource = neoapi.TriggerSource_Software
+        # self.camera.f.TriggerSoftware.Execute()
         self.camera.f.TriggerSource = neoapi.TriggerSource_Line2
         self.camera.f.TriggerActivation = neoapi.TriggerActivation_RisingEdge
-       #self.camera.f.TriggerActivation neoapi.AcquisitionStatusSelector_AcquisitionTriggerWait
-        #self.cam_event = neoapi.NeoEvent()
-        #self.camera.ClearEvents()
-        #self.camera.EnableEvent("ExposureStart")
+        # self.camera.f.TriggerActivation neoapi.AcquisitionStatusSelector_AcquisitionTriggerWait
+        # self.cam_event = neoapi.NeoEvent()
+        # self.camera.ClearEvents()
+        # self.camera.EnableEvent("ExposureStart")
 
-        #self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
-        #self.camera.EnableChunk('ExposureTime')
-        #self.camera.EnableEvent("ExposureStart")
+        # self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
+        # self.camera.EnableChunk('ExposureTime')
+        # self.camera.EnableEvent("ExposureStart")
         self.triggerUpdateBool = False
         self.printFPS = False
         self.img_arr = []
@@ -159,10 +161,8 @@ class vStream():
         self.thread_array_read = Thread(target=self.get_full_arr, args=())
         self.thread_array_read.daemon = True
 
-
         self.thread_save_array = Thread(target=self.save_array, args=())
         self.thread_save_array.daemon = True
-
 
         self.img_arr_A = []
         self.img_arr_B = []
@@ -178,8 +178,6 @@ class vStream():
         self.save_last_array = False
 
         self.cam_t0 = 0
-
-
 
     def click_event(self, event, x, y, flags, params):
         self.event = event
@@ -209,7 +207,7 @@ class vStream():
             self.img_arr_A.append(self.temp)
             self.img_arr_B.append(self.temp)
         while True:
-            for self.i in range(0,self.buffer_arr_max):
+            for self.i in range(0, self.buffer_arr_max):
                 try:
                     self.img = self.camera.GetImage(self.timeOut_ms)
                     self.img_arr_A[self.i] = self.img
@@ -218,7 +216,7 @@ class vStream():
                     print('Image grab problem print problem')
             self.arr_A_full = True
             self.arr_B_full = False
-            for self.i in range(0,self.buffer_arr_max):
+            for self.i in range(0, self.buffer_arr_max):
                 try:
                     self.img = self.camera.GetImage(self.timeOut_ms)
                     self.img_arr_B[self.i] = self.img
@@ -246,7 +244,7 @@ class vStream():
     def save_array(self):
         if (record_mode == True):
             with open(raw_data_save_dir + '/' + test_ID + '_CAM_' + self.windowName + '.txt', 'a') as f:
-                self.heading_cam = 'Frame'+'\t'+'Frame_Name'+'\t'+'Cam_Time'+'\n'
+                self.heading_cam = 'Frame' + '\t' + 'Frame_Name' + '\t' + 'Cam_Time' + '\n'
                 f.write(self.heading_cam)
         while True:
             try:
@@ -263,22 +261,25 @@ class vStream():
                     self.displayWait = False
 
                     if (record_mode == True):
-                        for self.k in range(0, self.buffer_arr_max): #saves an image as .tif and adds image details to .csv file
+                        for self.k in range(0,
+                                            self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
 
-                            self.img_title = str(test_ID) + '_' + str(self.img_arr[self.k].GetImageID()) + '_' + self.windowName + '.tif'
+                            self.img_title = str(test_ID) + '_' + str(
+                                self.img_arr[self.k].GetImageID()) + '_' + self.windowName + '.tif'
                             self.fileName = self.cam_save_dir + '/' + self.img_title
                             self.save_img = self.img_arr[self.k].GetNPArray()
                             self.img_ID = self.img_arr[self.k].GetImageID()
                             self.img_TimeStamp = self.img_arr[self.k].GetTimestamp()
 
-
                             if (self.img_TimeStamp != 0):
                                 if (self.img_ID == 0):
                                     self.cam_t0 = self.img_TimeStamp
                                 self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
-                                self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(self.img_TimeStamp_zerod) + '\n'
+                                self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
+                                    self.img_TimeStamp_zerod) + '\n'
                                 tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
-                                with open(raw_data_save_dir + '/'  + test_ID + '_CAM_'+self.windowName+'.txt', 'a') as f:
+                                with open(raw_data_save_dir + '/' + test_ID + '_CAM_' + self.windowName + '.txt',
+                                          'a') as f:
                                     f.write(self.data)
                                 print('saved', self.data)
 
@@ -291,7 +292,7 @@ class vStream():
 
             self.img_8 = (self.frame / 256).astype('uint8')
             self.img_heat_8 = cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
-            #self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            # self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
             self.img_rotated = self.img_heat_8
 
             self.width = int(self.img_rotated.shape[1] * self.scale)
@@ -300,16 +301,20 @@ class vStream():
 
             self.img_resized_8 = cv2.resize(self.img_rotated, self.dim, interpolation=cv2.INTER_AREA)
 
-            cv2.line(self.img_resized_8, (0,round(self.height/2)), (self.width,round(self.height/2)), (0,255,0), 1)
-            cv2.line(self.img_resized_8, (round(self.width / 2),0), (round(self.width / 2),self.height), (0, 255, 0), 1)
+            cv2.line(self.img_resized_8, (0, round(self.height / 2)), (self.width, round(self.height / 2)), (0, 255, 0),
+                     1)
+            cv2.line(self.img_resized_8, (round(self.width / 2), 0), (round(self.width / 2), self.height), (0, 255, 0),
+                     1)
 
             if self.displayWait == False:
                 if (self.clicked > 0):
-                    #self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                    # self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
                     self.img_grey_rotated = self.img_8
-                    cv2.rectangle(self.img_resized_8, (self.x_0,self.y_0), (self.x_1,self.y_1), (0,0,255), 2)
-                    self.zoomed_img = self.img_rotated[self.y_0_scaled : self.y_1_scaled, self.x_0_scaled : self.x_1_scaled]
-                    self.zoomed_gray = self.img_grey_rotated[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
+                    cv2.rectangle(self.img_resized_8, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
+                    self.zoomed_img = self.img_rotated[self.y_0_scaled: self.y_1_scaled,
+                                      self.x_0_scaled: self.x_1_scaled]
+                    self.zoomed_gray = self.img_grey_rotated[self.y_0_scaled: self.y_1_scaled,
+                                       self.x_0_scaled: self.x_1_scaled]
                     cv2.imshow(self.zoomWindowName, self.zoomed_img)
                     self.showHistogram()
 
@@ -360,10 +365,12 @@ class vStream():
     def triggerUpdate(self):
         self.triggerUpdateBool = True
 
-class VideoShow: #still have to work out if I still nead the video show class
+
+class VideoShow:  # still have to work out if I still nead the video show class
     """
     Class that continuously shows a frame using a dedicated thread.
     """
+
     def __init__(self, frame=None):
         self.frame = frame
         self.stopped = False
@@ -372,13 +379,11 @@ class VideoShow: #still have to work out if I still nead the video show class
         self.thread.daemon = True
         self.thread.start()
 
-
     def triggerUpdateShow(self):
         self.triggerUpdateShowBool = True
 
-
     def show(self):
-        #self.windowName = windowName
+        # self.windowName = windowName
         while not self.stopped:
             try:
                 VideoShow.getScaledFrame_8(self)
@@ -387,7 +392,7 @@ class VideoShow: #still have to work out if I still nead the video show class
                     self.stopped = True
             except:
                 pass
-                #print('Video Show Exception')
+                # print('Video Show Exception')
 
     def stop(self):
         self.stopped = True
@@ -404,13 +409,14 @@ class VideoShow: #still have to work out if I still nead the video show class
         self.img_resized_8 = cv2.resize(self.img_heat_8, self.dim, interpolation=cv2.INTER_AREA)
 
 
-def getScaledFrame_8(img_8,scale_percent):
+def getScaledFrame_8(img_8, scale_percent):
     img_8 = cv2.applyColorMap(img_8, cv2.COLORMAP_TURBO)
     width = int(img_8.shape[1] * scale_percent / 100)
     height = int(img_8.shape[0] * scale_percent / 100)
     dim = (width, height)
     resized = cv2.resize(img_8, dim, interpolation=cv2.INTER_AREA)
     return resized
+
 
 def getHistogram(img_8):
     histr = cv2.calcHist([img_8], [0], None, [255], [0, 255])
@@ -437,14 +443,14 @@ def getHistogram(img_8):
     img_hist = cv2.flip(img_hist, 0)
     return img_hist
 
+
 threadTrigger = Thread(target=hardware_tigger, args=())
 threadTrigger.daemon = True
 threadTrigger.start()
 
-
-#(self,src,windowName, timeOut_ms)
-cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr,-16,0,1655,450,cam_1_save_dir)
-cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr,823,0,1655,740,cam_2_save_dir)
+# (self,src,windowName, timeOut_ms)
+cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir)
+cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir)
 
 cam1.start_vStream()
 cam2.start_vStream()
@@ -458,18 +464,17 @@ while True:
         cv2.setMouseCallback(cam1.windowName, cam1.click_event)
         cv2.setMouseCallback(cam2.windowName, cam2.click_event)
     except:
-        #print('Loading Camera')
-        #sleep(0.2)
+        # print('Loading Camera')
+        # sleep(0.2)
         pass
-    if cv2.waitKey(10) == "TEMPORTY BLOCK":#ord('q'):
-        #cam1.capture.release()
+    if cv2.waitKey(10) == "TEMPORTY BLOCK":  # ord('q'):
+        # cam1.capture.release()
         cam1.save_buffer_remainder()
         cv2.destroyAllWindows()
         exit(1)
         break
-    #if cv2.waitKey(10) == ord('q'):
-     #   exposure_time_ms = exposure_time_ms + 10
-
+    # if cv2.waitKey(10) == ord('q'):
+    #   exposure_time_ms = exposure_time_ms + 10
 
 """
 LIST OF EVENT NAMES FOR BAUMER VCXU-50:

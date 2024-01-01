@@ -7,7 +7,7 @@ import json
 import os
 import tkinter as tk
 from datetime import datetime
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from typing import Dict, Union
 
 from PIL import Image
@@ -60,11 +60,11 @@ def new_config_file():
 
 def get_available_com_ports():
     """Get a list of available COM ports."""
-    available_com_ports = [port.device for port in comports()]
+    available_com_ports = [str(port.device) for port in comports()]
     if len(available_com_ports) == 0:
-        return ["No COM ports available"]
+        return ["COM1, COM2"]
     else:
-        return available_com_ports
+        return ["COM1, COM2"] + available_com_ports
 
 
 def get_available_cameras():
@@ -171,9 +171,37 @@ class GUI:
         frame = ttk.LabelFrame(self.master, text="Config File")
         frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
 
-        # Create load config combobox
+        # Create load config combobox function
+        def update_config(event):
+            # Show a warning message
+            if not messagebox.askokcancel("Warning", "Existing settings selections will be overridden. Continue?"):
+                return
+
+            # Get the selected file
+            selected_file = select_config_combobox.get()
+
+            # Load the configuration from the selected file
+            with open(os.path.join(CONFIG_DIR, selected_file), 'r') as file:
+                config = json.load(file)
+
+            # Update the settings in the Config frame
+            for frame_name, frame_controls in self.CONFIG_WIDGETS.items():
+                for control_name, control_options in frame_controls.items():
+                    # Get the control widget
+                    control = control_options["widget"]
+
+                    # Get the value from the loaded config
+                    value = config.get(frame_name, {}).get(control_name, "")
+
+                    # Update the control widget with the loaded value
+                    if isinstance(control, ttk.Entry) or isinstance(control, ttk.Combobox):
+                        control.delete(0, tk.END)
+                        control.insert(0, value)
+
+        # create the combobox for selecting a config file
         select_config_combobox = self.create_control(parent=frame, name="Select Config File",
-                                                     options=dict(type="combobox", value=list_existing_configs()), )
+                                                     options=dict(type="combobox", value=list_existing_configs()))
+        select_config_combobox.bind("<<ComboboxSelected>>", update_config)  # update the config when a file is selected
         select_config_combobox.pack(**packing)
 
         # Create save button
@@ -382,8 +410,8 @@ def make_default_dict():
 
 
 if __name__ == "__main__":
-    run_gui()
-    # make_default_dict()
+    # run_gui()
+    make_default_dict()
 
 # todo: create a "have you saved" warning when exiting
 # todo: update actual settings from gui. eg. comport

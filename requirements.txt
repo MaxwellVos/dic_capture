@@ -28,3 +28,6 @@ scipy==1.9.3
 six==1.16.0
 tifffile==2022.10.10
 tzdata==2023.3
+
+ttkthemes~=3.2.2
+neoapi~=1.2.0

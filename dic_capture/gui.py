@@ -165,6 +165,49 @@ class GUI:
 
         self.load_logo()
 
+    def create_config_select_frame(self):
+        """Create a frame for selecting a config file."""
+        # Create the frame
+        frame = ttk.LabelFrame(self.master, text="Config File")
+        frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
+
+        # Create load config combobox
+        select_config_combobox = self.create_control(parent=frame, name="Select Config File",
+                                                     options=dict(type="combobox", value=list_existing_configs()), )
+        select_config_combobox.pack(**packing)
+
+        # Create save button
+        save_config_button = self.create_control(parent=frame, name="Save",
+                                                 options=dict(type="button", command=self.save_config_to_file))
+        save_config_button.pack(**packing)
+
+        # create save as button
+        save_as_config_button = self.create_control(parent=frame, name="Save As",
+                                                    options=dict(type="button", command=self.save_config_to_file))
+        save_as_config_button.pack(**packing)
+
+        # new_config_button = self.create_control(parent=frame, name="New Config File",
+        #                                         options=dict(type="button", command=new_config_file))
+        # new_config_button.pack(**packing)
+
+
+
+
+    def create_run_frame(self):
+        """Create a frame for running the program."""
+        # Create the frame
+        frame = ttk.LabelFrame(self.master, text="Run")
+        frame.grid(row=1, column=0, sticky='ew', padx=10, pady=10)
+
+        # Create the controls in the frame
+        run_record_button = self.create_control(parent=frame, name="Run Record Mode",
+                                                options=dict(type="button", command=run_record_mode))
+        run_record_button.pack(**packing)
+
+        run_test_button = self.create_control(parent=frame, name="Run Test Mode",
+                                              options=dict(type="button", command=run_test_mode))
+        run_test_button.pack(**packing)
+
     def create_config_frame(self):
         """Create a frame for configuring settings."""
         # Create the outer frame
@@ -213,40 +256,6 @@ class GUI:
             control = self.create_control(parent=parent, name=name, options=option)
             control.pack(**packing)
             control_dict[name]["widget"] = control
-
-    def create_config_select_frame(self):
-        """Create a frame for selecting a config file."""
-        # Create the frame
-        frame = ttk.LabelFrame(self.master, text="Config File")
-        frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
-
-        # Create the controls in the frame
-        new_config_button = self.create_control(parent=frame, name="New Config File",
-                                                options=dict(type="button", command=new_config_file))
-        new_config_button.pack(**packing)
-
-        save_config_button = self.create_control(parent=frame, name="Save Config File",
-                                                 options=dict(type="button", command=self.save_config_to_file))
-        save_config_button.pack(**packing)
-
-        select_config_combobox = self.create_control(parent=frame, name="Select Config File",
-                                                     options=dict(type="combobox", value=list_existing_configs()))
-        select_config_combobox.pack(**packing)
-
-    def create_run_frame(self):
-        """Create a frame for running the program."""
-        # Create the frame
-        frame = ttk.LabelFrame(self.master, text="Run")
-        frame.grid(row=1, column=0, sticky='ew', padx=10, pady=10)
-
-        # Create the controls in the frame
-        run_record_button = self.create_control(parent=frame, name="Run Record Mode",
-                                                options=dict(type="button", command=run_record_mode))
-        run_record_button.pack(**packing)
-
-        run_test_button = self.create_control(parent=frame, name="Run Test Mode",
-                                              options=dict(type="button", command=run_test_mode))
-        run_test_button.pack(**packing)
 
     @staticmethod
     def create_control(parent: Union[ttk.LabelFrame, ttk.Frame], name: str, options: Dict):
@@ -376,6 +385,7 @@ if __name__ == "__main__":
     run_gui()
     # make_default_dict()
 
+# todo: create a "have you saved" warning when exiting
 # todo: update actual settings from gui. eg. comport
 # todo: add function for saving config settings to config file
 # todo: add function for loading existing settings from config file

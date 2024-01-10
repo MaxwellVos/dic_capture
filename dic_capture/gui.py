@@ -1,5 +1,4 @@
-"""This module contains the GUI for the DIC-Capture program.
-The GUI is used to select settings and run the program.
+"""This module contains the GUI for the DIC-Capture program. The GUI is used to select settings and run the program.
 The main program function is in dic_capture/run.py."""
 # =====================================
 # Imports
@@ -68,12 +67,13 @@ def browse_file(widget):
 
 # =====================================
 # GUI class
+
 packing = dict(padx=10, pady=5, fill='x')
 
 
 class GUI:
     def __init__(self, master: ThemedTk):
-        self.CONFIG_WIDGETS = {
+        self.config_widgets = {
             "IO Config": {
                 "Output Folder": dict(
                     type="filedialog", value=os.getcwd()
@@ -167,7 +167,7 @@ class GUI:
                 config = json.load(file)
 
             # Update the settings in the Config frame
-            for frame_name, frame_controls in self.CONFIG_WIDGETS.items():
+            for frame_name, frame_controls in self.config_widgets.items():
                 for control_name, control_options in frame_controls.items():
                     # Get the control widget
                     control = control_options["widget"]
@@ -200,9 +200,6 @@ class GUI:
         #                                         options=dict(type="button", command=new_config_file))
         # new_config_button.pack(**packing)
 
-
-
-
     def create_run_frame(self):
         """Create a frame for running the program."""
         # Create the frame
@@ -228,25 +225,25 @@ class GUI:
         # IO Config Frame
         io_config_frame = ttk.LabelFrame(frame, text="IO Config")
         io_config_frame.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=io_config_frame, control_dict=self.CONFIG_WIDGETS["IO Config"])
+        self.add_controls(parent=io_config_frame, control_dict=self.config_widgets["IO Config"])
 
         # Arduino Config Frame
         arduino_config_frame = ttk.LabelFrame(frame, text="Arduino Config")
         arduino_config_frame.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=arduino_config_frame, control_dict=self.CONFIG_WIDGETS["Arduino Config"])
+        self.add_controls(parent=arduino_config_frame, control_dict=self.config_widgets["Arduino Config"])
 
         # Camera Config Frames adjacent to each other
         camera_config_frame_1 = ttk.LabelFrame(frame, text="Camera 1 Config")
         camera_config_frame_1.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=camera_config_frame_1, control_dict=self.CONFIG_WIDGETS["Camera 1 Config"])
+        self.add_controls(parent=camera_config_frame_1, control_dict=self.config_widgets["Camera 1 Config"])
 
         camera_config_frame_2 = ttk.LabelFrame(frame, text="Camera 2 Config")
         camera_config_frame_2.grid(row=2, column=1, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=camera_config_frame_2, control_dict=self.CONFIG_WIDGETS["Camera 2 Config"])
+        self.add_controls(parent=camera_config_frame_2, control_dict=self.config_widgets["Camera 2 Config"])
 
         camera_config_frame_3 = ttk.LabelFrame(frame, text="Camera 3 Config")
         camera_config_frame_3.grid(row=2, column=2, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=camera_config_frame_3, control_dict=self.CONFIG_WIDGETS["Camera 3 Config"])
+        self.add_controls(parent=camera_config_frame_3, control_dict=self.config_widgets["Camera 3 Config"])
 
         # Naming Frame
         # test_id_frame = ttk.LabelFrame(frame, text="Naming")
@@ -314,7 +311,7 @@ class GUI:
         config = {}
 
         # Iterate over the frames in the config frame
-        for frame_name, frame_controls in self.CONFIG_WIDGETS.items():
+        for frame_name, frame_controls in self.config_widgets.items():
             # Initialize an empty dictionary to store the settings for this frame
             frame_config = {}
 
@@ -366,35 +363,52 @@ class GUI:
             print(f"Error loading logo: {e}")
 
 
+# =====================================
+# Main program function
+
 def run_gui():
+    """Run the program by opening the GUI."""
     root = ThemedTk(theme="plastik")
     app = GUI(root)
     root.mainloop()
 
 
+# =====================================
+# Helper function for creating a default config file
+
 def make_default_dict():
+    """Use current settings from the GUI to create a default config file."""
+    # Create the GUI to get the default settings
     root = ThemedTk(theme="plastik")
     app = GUI(root)
-    config = {}  # Initialize an empty dictionary to store the config
 
-    for frame_name, frame_controls in app.CONFIG_WIDGETS.items():
-        frame_config = {}  # Initialize an empty dictionary to store the settings for this frame
+    # Initialize an empty dictionary to store the config
+    config = {}
+
+    for frame_name, frame_controls in app.config_widgets.items():
+        frame_config = {}
 
         for control_name, control_options in frame_controls.items():
             default_value = control_options.get("value", "")
             frame_config[control_name] = default_value
 
-        config[frame_name] = frame_config  # Add the frame config to the main config
+        config[frame_name] = frame_config  # Add the frame config dicts to the main config dict
 
+    # Write the default config to a json file
     config_json = json.dumps(config, indent=4)
     with open('default_config_file_auto.json', 'w') as file:
         file.write(config_json)
 
 
+# =====================================
+# Run as script
+
 if __name__ == "__main__":
     run_gui()
     # make_default_dict()
 
+# =====================================
+# Todos
 
 # todo: add function for loading existing settings from config file
 # todo: make save dialog open to saved_configs folder

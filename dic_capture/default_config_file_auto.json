@@ -1,0 +1,34 @@
+{
+    "IO Config": {
+        "Output Folder": "C:\\Users\\SLTDAN002\\PycharmProjects\\dic_capture\\dic_capture",
+        "Test ID": "Test_ID_20240101_170633"
+    },
+    "Arduino Config": {
+        "Choose COM Port:": [
+            "No COM ports available"
+        ],
+        "Baud Rate": "",
+        "Max Buffer": ""
+    },
+    "Camera 1 Config": {
+        "Camera Source": [
+            "Camera auto-detect not yet implemented."
+        ],
+        "Exposure Time (ms)": "",
+        "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+    },
+    "Camera 2 Config": {
+        "Camera Source": [
+            "Camera auto-detect not yet implemented."
+        ],
+        "Exposure Time (ms)": "",
+        "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+    },
+    "Camera 3 Config": {
+        "Camera Source": [
+            "Camera auto-detect not yet implemented."
+        ],
+        "Exposure Time (ms)": "",
+        "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+    }
+}

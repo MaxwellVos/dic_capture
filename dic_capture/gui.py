@@ -44,20 +44,6 @@ def list_existing_configs():
     return [file for file in os.listdir(CONFIG_DIR) if file.endswith(".json")]
 
 
-def new_config_file():
-    """Create a new config file with default settings, and save it to a specified path."""
-    # Load the default settings from the JSON file
-    with open('default_config_file.json', 'r') as file:
-        default_config = json.load(file)
-
-    # Open a file dialog to choose where to save the new config file
-    config_file_path = filedialog.asksaveasfilename(defaultextension=".json")
-
-    # Save the default config to the chosen file
-    with open(config_file_path, 'w') as file:
-        json.dump(default_config, file, indent=4)
-
-
 def get_available_com_ports():
     """Get a list of available COM ports."""
     available_com_ports = [str(port.device) for port in comports()]
@@ -75,7 +61,6 @@ def get_available_cameras():
 
 def browse_file(widget):
     """Open a file dialog and insert the selected file path into the specified widget."""
-    # todo: update this to open to default location with informative header and default new name
     file_path = filedialog.askopenfilename()
     widget.delete(0, tk.END)
     widget.insert(0, file_path)
@@ -90,9 +75,6 @@ class GUI:
     def __init__(self, master: ThemedTk):
         self.CONFIG_WIDGETS = {
             "IO Config": {
-                # "Input Path": dict(
-                #     type="filedialog", value=os.getcwd()
-                # ),
                 "Output Folder": dict(
                     type="filedialog", value=os.getcwd()
                 ),
@@ -105,32 +87,32 @@ class GUI:
                     type="combobox", value=get_available_com_ports()
                 ),
                 "Baud Rate": dict(
-                    type="entry", value=""
+                    type="entry", value=115200
                 ),
                 "Max Buffer": dict(
-                    type="entry", value=""
+                    type="entry", value=3
                 ),
             },
             "Camera 1 Config": {
                 "Camera Source": dict(
-                    type="combobox", value=get_available_cameras()
+                    type="combobox", value="P1-6"
                 ),
                 "Exposure Time (ms)": dict(
-                    type="entry", value=""
+                    type="entry", value=1.6
                 ),
                 'FPS Stages (e.g. "0, 0.1, 0, 0.1")': dict(
-                    type="entry", value=""
+                    type="entry", value="0, 0.1"
                 ),
             },
             "Camera 2 Config": {
                 "Camera Source": dict(
-                    type="combobox", value=get_available_cameras()
+                    type="combobox", value="P1-5"
                 ),
                 "Exposure Time (ms)": dict(
-                    type="entry", value=""
+                    type="entry", value=1.6
                 ),
                 'FPS Stages (e.g. "0, 0.1, 0, 0.1")': dict(
-                    type="entry", value=""
+                    type="entry", value="0, 0.1"
                 ),
             },
             "Camera 3 Config": {
@@ -410,12 +392,13 @@ def make_default_dict():
 
 
 if __name__ == "__main__":
-    # run_gui()
-    make_default_dict()
+    run_gui()
+    # make_default_dict()
 
-# todo: create a "have you saved" warning when exiting
+
+# todo: add function for loading existing settings from config file
+# todo: make save dialog open to saved_configs folder
 # todo: update actual settings from gui. eg. comport
 # todo: add function for saving config settings to config file
-# todo: add function for loading existing settings from config file
 # todo: separate creation of controls and filling with default values
 # todo: add max_buffer_arr setting

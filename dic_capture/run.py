@@ -1,58 +1,114 @@
-"""This module contains the run function, which contains the main program loop.
-It is called by the GUI when the user clicks the "Run" button.
-The GUI is used to create a config file, which is then passed to the run function."""
+"""This module contains the run function, which contains the main program loop. It is called by the GUI when the user
+clicks the "Run" button. The GUI is used to create a config file, which is then passed to the run function."""
+
+# ======================================================================================================================
+# Imports
+
+import os
+from threading import Thread
+from time import sleep
 from typing import Dict, Any
 
-import serial
 import cv2
 import neoapi
 import numpy as np
+import serial
 import tifffile as tf
-from threading import Thread
-from time import sleep
-import easygui
-import os
 
-import json
 
+# ======================================================================================================================
+# Main Program Loop
 
 def run(config: Dict[str, Any]):
-    """Run the DIC Capture software with the given config file path and record mode."""
-    # settings from config
-    record_mode = config["record_mode"]
-    exposure_time_ms = config["exposure_time_ms"]
-    max_buffer_arr = config["max_buffer_arr"]
-    fps_values = config["fps_values"]
-    save_path = config["save_path"]
-    test_id = config["test_ID"]
+    """Run the DIC Capture software with the given config file path and record mode.
 
+    Example config file:
+    {
+        "Record Mode": false,
+        "IO Config": {
+            "Output Folder": "dic-capture output",
+            "Test ID": "Test_ID_default"
+        },
+        "Arduino Config": {
+            "Choose COM Port:": [
+                "No COM ports available"
+            ],
+            "Baud Rate": "",
+            "Max Buffer": ""
+        },
+        "Camera 1 Config": {
+            "Camera Source": [
+                "Camera auto-detect not yet implemented."
+            ],
+            "Exposure Time (ms)": "",
+            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+        },
+        "Camera 2 Config": {
+            "Camera Source": [
+                "Camera auto-detect not yet implemented."
+            ],
+            "Exposure Time (ms)": "",
+            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+        },
+        "Camera 3 Config": {
+            "Camera Source": [
+                "Camera auto-detect not yet implemented."
+            ],
+            "Exposure Time (ms)": "",
+            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+        }
+    }
+    """
+    # Extract the IO settings from config
+    output_folder = config["IO Config"]["Output Folder"]
+    test_id = config["IO Config"]["Test ID"]
+
+    # Extract the Arduino settings from config
+    arduino_com_port = config["Arduino Config"]["Choose COM Port:"]
+    arduino_baud_rate = config["Arduino Config"]["Baud Rate"]
+    arduino_max_buffer = config["Arduino Config"]["Max Buffer"]
+
+    # Extract the Camera 1 settings from config
+    cam1_src = config["Camera 1 Config"]["Camera Source"]
+    cam1_exposure_time_ms = config["Camera 1 Config"]["Exposure Time (ms)"]
+    cam1_fps_stages = config["Camera 1 Config"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+
+    # Extract the Camera 2 settings from config
+    cam2_src = config["Camera 2 Config"]["Camera Source"]
+    cam2_exposure_time_ms = config["Camera 2 Config"]["Exposure Time (ms)"]
+    cam2_fps_stages = config["Camera 2 Config"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+
+    # Extract the Camera 3 settings from config
+    cam3_source = config["Camera 3 Config"]["Camera Source"]
+    cam3_exposure_time_ms = config["Camera 3 Config"]["Exposure Time (ms)"]
+    cam3_fps_stages = config["Camera 3 Config"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+
+    # Output directories
+    raw_data_save_dir = output_folder + '/Raw_Data'  # this is hardcoded
+    cam_1_save_dir = output_folder + '/Camera_1'
+    cam_2_save_dir = output_folder + '/Camera_2'
+    cam_3_save_dir = output_folder + '/Camera_3'
+    synced_data_save_dir = output_folder + '/Synced_Data'
+    dic_results_save_dir = output_folder + '/DIC_Results'
+
+    output_subfolders = [raw_data_save_dir, cam_1_save_dir, cam_2_save_dir, cam_3_save_dir, synced_data_save_dir,
+                         dic_results_save_dir]
+
+    # Create the output folder and sub-folders if record mode is true
+    record_mode = config["Record Mode"]
     if record_mode:
-        raw_data_save_dir = os.path.join(save_path, "Raw_Data")
-        os.makedirs(raw_data_save_dir, exist_ok=True)
-        cam_1_save_dir = os.path.join(save_path, "Camera_1")
-        os.makedirs(cam_1_save_dir, exist_ok=True)
-        cam_2_save_dir = os.path.join(save_path, "Camera_2")
-        os.makedirs(cam_2_save_dir, exist_ok=True)
-        cam_3_save_dir = os.path.join(save_path, "Camera_3")
-        os.makedirs(cam_3_save_dir, exist_ok=True)
-        synced_data_save_dir = os.path.join(save_path, "Synced_Data")
-        os.makedirs(synced_data_save_dir, exist_ok=True)
-        dic_results_save_dir = os.path.join(save_path, "DIC_Results")
-        os.makedirs(dic_results_save_dir, exist_ok=True)
+        for folder in output_subfolders:
+            os.makedirs(folder, exist_ok=True)
 
-    else:
-        max_buffer_arr = 3
-        fps_values = [0, 20, 0]
-        save_path = ''
-        test_id = ''
-        raw_data_save_dir = ''
-        cam_1_save_dir = ''
-        cam_2_save_dir = ''
+    # Create a serial connection to the Arduino
+    ser = serial.Serial(arduino_com_port, arduino_baud_rate, timeout=2)  # add timeout setting to GUI?
 
-    cam1_src = 'P1-6'  # 'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
-    cam2_src = 'P1-5'  # 'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
+    # todo: update program below
 
-    ser = serial.Serial('COM4', 115200, timeout=2)
+    # OLD VARIABLE NAMES HERE
+    fps_values = cam1_fps_stages
+    exposure_time_ms = cam1_exposure_time_ms
+    max_buffer_arr = arduino_max_buffer
 
     def hardware_tigger():
         # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
@@ -288,8 +344,8 @@ def run(config: Dict[str, Any]):
                          (0, 255, 0),
                          1)
 
-                if self.displayWait == False:
-                    if (self.clicked > 0):
+                if not self.displayWait:
+                    if self.clicked > 0:
                         # self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
                         self.img_grey_rotated = self.img_8
                         cv2.rectangle(self.img_resized_8, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
@@ -454,4 +510,3 @@ def run(config: Dict[str, Any]):
         # if cv2.waitKey(10) == ord('q'):
         #   exposure_time_ms = exposure_time_ms + 10
     return 0
-

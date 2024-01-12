@@ -1,7 +1,8 @@
 {
+    "Record Mode": false,
     "IO Config": {
-        "Output Folder": "dic-capture output",
-        "Test ID": "Test_ID_default"
+        "Output Folder": "C:\\Users\\SLTDAN002\\PycharmProjects\\dic_capture\\dic_capture",
+        "Test ID": "Test_ID_20240101_170633"
     },
     "Arduino Config": {
         "Choose COM Port:": [

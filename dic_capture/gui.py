@@ -20,7 +20,7 @@ from dic_capture.run import run
 # Global variables
 
 CONFIG_DIR = "../saved_configs"
-DIC_CAPTURE_VERSION = "0.0.2"
+DIC_CAPTURE_VERSION = "0.0.3"
 
 
 # =====================================
@@ -28,13 +28,13 @@ DIC_CAPTURE_VERSION = "0.0.2"
 
 def run_record_mode(config: Dict):
     """Set the config to record mode and run the program."""
-    config["record_mode"] = True
+    config["Record Mode"] = True
     run(config)
 
 
 def run_test_mode(config: Dict):
     """Set the config to test mode and run the program."""
-    config["record_mode"] = False
+    config["Record Mode"] = False
     run(config)
 
 
@@ -47,9 +47,9 @@ def get_available_com_ports():
     """Get a list of available COM ports."""
     available_com_ports = [str(port.device) for port in comports()]
     if len(available_com_ports) == 0:
-        return ["COM1, COM2"]
+        return ["COM1", "COM2"]
     else:
-        return ["COM1, COM2"] + available_com_ports
+        return ["COM1", "COM2"] + available_com_ports
 
 
 def get_available_cameras():
@@ -65,24 +65,65 @@ def browse_file(widget):
     widget.insert(0, file_path)
 
 
+def save_config_file():
+    """Save the current settings to the selected file."""
+    pass
+
+
+def save_as_config_file():
+    """Save the current settings to a new config file."""
+    pass
+
+
+def update_config(event, select_config_combobox, config_widgets):
+    """Update the settings in the Config frame based on the selected config file."""
+    if not messagebox.askokcancel("Warning", "Existing settings selections will be overridden. Continue?"):
+        return
+
+    # Get the selected file
+    selected_file = select_config_combobox.get()
+
+    # Load the configuration from the selected file
+    with open(os.path.join(CONFIG_DIR, selected_file), 'r') as file:
+        config = json.load(file)
+
+    # Update the settings in the Config frame
+    for frame_name, frame_controls in config_widgets.items():
+        for control_name, control_options in frame_controls.items():
+            # Get the control widget
+            control = control_options["widget"]
+
+            # Get the value from the loaded config
+            value = config.get(frame_name, {}).get(control_name, "")
+
+            # Update the control widget with the loaded value
+            if isinstance(control, ttk.Entry) or isinstance(control, ttk.Combobox):
+                control.delete(0, tk.END)
+                control.insert(0, value)
+
+
 # =====================================
 # GUI class
 
-packing = dict(padx=10, pady=5, fill='x')
+packing = dict(padx=4, pady=10, fill='x')
 
 
 class GUI:
     def __init__(self, master: ThemedTk):
+        # Dictionary of settings for creating the widgets in the config frame
         self.config_widgets = {
-            "IO Config": {
-                "Output Folder": dict(
-                    type="filedialog", value=os.getcwd()
+            "I/O": {
+                "Config File": dict(
+                    type="savebox", value=list_existing_configs()
                 ),
                 "Test ID": dict(
                     type="entry", value="Test_ID_" + datetime.now().strftime("%Y%m%d_%H%M%S")
                 ),
+                "Output Folder": dict(
+                    type="filedialog", value=os.getcwd()
+                ),
             },
-            "Arduino Config": {
+            "Arduino": {
                 "Choose COM Port:": dict(
                     type="combobox", value=get_available_com_ports()
                 ),
@@ -93,7 +134,7 @@ class GUI:
                     type="entry", value=3
                 ),
             },
-            "Camera 1 Config": {
+            "Camera 1": {
                 "Camera Source": dict(
                     type="combobox", value="P1-6"
                 ),
@@ -104,7 +145,7 @@ class GUI:
                     type="entry", value="0, 0.1"
                 ),
             },
-            "Camera 2 Config": {
+            "Camera 2": {
                 "Camera Source": dict(
                     type="combobox", value="P1-5"
                 ),
@@ -115,7 +156,7 @@ class GUI:
                     type="entry", value="0, 0.1"
                 ),
             },
-            "Camera 3 Config": {
+            "Camera 3": {
                 "Camera Source": dict(
                     type="combobox", value=get_available_cameras()
                 ),
@@ -126,198 +167,136 @@ class GUI:
                     type="entry", value=""
                 ),
             },
-            # "Naming": {
-            #     "Test ID": dict(
-            #         type="entry", value="Test_ID_" + datetime.now().strftime("%Y%m%d_%H%M%S")
-            #     ),
-            # },
-            # "Other Settings": {
-            #     "Other Setting 1": dict(
-            #         type="entry", value="default value"
-            #     ),
         }
 
+        # Create the main window
         self.master = master
         self.master.title('DIC-Capture v' + DIC_CAPTURE_VERSION)
         self.master.configure()
 
-        self.create_config_select_frame()
-        self.create_run_frame()
+        # Create the frames
         self.create_config_frame()
-
+        self.create_run_frame()
         self.load_logo()
 
-    def create_config_select_frame(self):
-        """Create a frame for selecting a config file."""
-        # Create the frame
-        frame = ttk.LabelFrame(self.master, text="Config File")
-        frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
-
-        # Create load config combobox function
-        def update_config(event):
-            # Show a warning message
-            if not messagebox.askokcancel("Warning", "Existing settings selections will be overridden. Continue?"):
-                return
-
-            # Get the selected file
-            selected_file = select_config_combobox.get()
-
-            # Load the configuration from the selected file
-            with open(os.path.join(CONFIG_DIR, selected_file), 'r') as file:
-                config = json.load(file)
-
-            # Update the settings in the Config frame
-            for frame_name, frame_controls in self.config_widgets.items():
-                for control_name, control_options in frame_controls.items():
-                    # Get the control widget
-                    control = control_options["widget"]
-
-                    # Get the value from the loaded config
-                    value = config.get(frame_name, {}).get(control_name, "")
-
-                    # Update the control widget with the loaded value
-                    if isinstance(control, ttk.Entry) or isinstance(control, ttk.Combobox):
-                        control.delete(0, tk.END)
-                        control.insert(0, value)
-
-        # create the combobox for selecting a config file
-        select_config_combobox = self.create_control(parent=frame, name="Select Config File",
-                                                     options=dict(type="combobox", value=list_existing_configs()))
-        select_config_combobox.bind("<<ComboboxSelected>>", update_config)  # update the config when a file is selected
-        select_config_combobox.pack(**packing)
-
-        # Create save button
-        save_config_button = self.create_control(parent=frame, name="Save",
-                                                 options=dict(type="button", command=self.save_config_to_file))
-        save_config_button.pack(**packing)
-
-        # create save as button
-        save_as_config_button = self.create_control(parent=frame, name="Save As",
-                                                    options=dict(type="button", command=self.save_config_to_file))
-        save_as_config_button.pack(**packing)
-
-        # new_config_button = self.create_control(parent=frame, name="New Config File",
-        #                                         options=dict(type="button", command=new_config_file))
-        # new_config_button.pack(**packing)
+        # Variable for storing the current settings
+        self.current_settings = dict()
 
     def create_run_frame(self):
         """Create a frame for running the program."""
         # Create the frame
-        frame = ttk.LabelFrame(self.master, text="Run")
-        frame.grid(row=1, column=0, sticky='ew', padx=10, pady=10)
+        frame = ttk.LabelFrame(self.master, text="Run", borderwidth=4)
+        frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
 
-        # Create the controls in the frame
-        run_record_button = self.create_control(parent=frame, name="Run Record Mode",
-                                                options=dict(type="button", command=run_record_mode))
+        # Get all the current settings in the config frame
+        self.update_current_settings()
+
+        # Create the run record mode button
+        run_record_button = self._create_control(parent=frame, name="Run Record Mode",
+                                                 widget_options=dict(type="button", command=lambda: run_record_mode(
+                                                     self.current_settings)))
         run_record_button.pack(**packing)
 
-        run_test_button = self.create_control(parent=frame, name="Run Test Mode",
-                                              options=dict(type="button", command=run_test_mode))
+        # Create the run test mode button
+        run_test_button = self._create_control(parent=frame, name="Run Test Mode",
+                                               widget_options=dict(type="button", command=lambda: run_test_mode(
+                                                   self.current_settings)))
         run_test_button.pack(**packing)
 
     def create_config_frame(self):
         """Create a frame for configuring settings."""
         # Create the outer frame
-        frame = ttk.Frame(self.master, relief='sunken', borderwidth=2)
-
-        frame.grid(row=0, rowspan=3, column=1, sticky='nsew', padx=10, pady=10)
+        frame = ttk.Frame(self.master, relief="sunken", borderwidth=2)
+        frame.grid(row=0, rowspan=2, column=1, sticky='nsew', padx=10, pady=10)
 
         # IO Config Frame
-        io_config_frame = ttk.LabelFrame(frame, text="IO Config")
+        io_config_frame = ttk.LabelFrame(frame, text="I/O", borderwidth=4)
         io_config_frame.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=io_config_frame, control_dict=self.config_widgets["IO Config"])
+        self._add_controls(parent=io_config_frame, control_dict=self.config_widgets["I/O"])
 
         # Arduino Config Frame
-        arduino_config_frame = ttk.LabelFrame(frame, text="Arduino Config")
+        arduino_config_frame = ttk.LabelFrame(frame, text="Arduino", borderwidth=4)
         arduino_config_frame.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=arduino_config_frame, control_dict=self.config_widgets["Arduino Config"])
+        self._add_controls(parent=arduino_config_frame, control_dict=self.config_widgets["Arduino"])
 
         # Camera Config Frames adjacent to each other
-        camera_config_frame_1 = ttk.LabelFrame(frame, text="Camera 1 Config")
+        camera_config_frame_1 = ttk.LabelFrame(frame, text="Camera 1", borderwidth=4)
         camera_config_frame_1.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=camera_config_frame_1, control_dict=self.config_widgets["Camera 1 Config"])
+        self._add_controls(parent=camera_config_frame_1, control_dict=self.config_widgets["Camera 1"])
 
-        camera_config_frame_2 = ttk.LabelFrame(frame, text="Camera 2 Config")
+        camera_config_frame_2 = ttk.LabelFrame(frame, text="Camera 2", borderwidth=4)
         camera_config_frame_2.grid(row=2, column=1, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=camera_config_frame_2, control_dict=self.config_widgets["Camera 2 Config"])
+        self._add_controls(parent=camera_config_frame_2, control_dict=self.config_widgets["Camera 2"])
 
-        camera_config_frame_3 = ttk.LabelFrame(frame, text="Camera 3 Config")
+        camera_config_frame_3 = ttk.LabelFrame(frame, text="Camera 3", borderwidth=4)
         camera_config_frame_3.grid(row=2, column=2, sticky='nsew', padx=10, pady=10)
-        self.add_controls(parent=camera_config_frame_3, control_dict=self.config_widgets["Camera 3 Config"])
+        self._add_controls(parent=camera_config_frame_3, control_dict=self.config_widgets["Camera 3"])
 
-        # Naming Frame
-        # test_id_frame = ttk.LabelFrame(frame, text="Naming")
-        # test_id_frame.grid(row=3, column=0, columnspan=3, sticky='nsew', padx=10, pady=10)
-        # self.add_controls(parent=test_id_frame, control_dict=self.CONFIG_WIDGETS["Naming"])
-
-        # Other Settings Frame
-        # other_settings_frame = ttk.LabelFrame(frame, text="Other Settings")
-        # other_settings_frame.grid(row=4, column=0, columnspan=3, sticky='nsew', padx=10, pady=10)
-        # self.add_controls(parent=other_settings_frame, control_dict=self.CONFIG_WIDGETS["Other Settings"])
-
-    def add_controls(self, parent: ttk.LabelFrame, control_dict: Dict):
+    def _add_controls(self, parent: ttk.LabelFrame, control_dict: Dict):
         """Add a control to the parent frame based on the control type and options."""
         for name, option in control_dict.items():
             label = ttk.Label(parent, text=name + ":")
-            label.pack(**packing)
-            control = self.create_control(parent=parent, name=name, options=option)
-            control.pack(**packing)
+            label.pack({**packing, 'pady': (5, 0)})
+            control = self._create_control(parent=parent, name=name, widget_options=option)
+            control.pack({**packing, 'pady': 0})
             control_dict[name]["widget"] = control
 
-    @staticmethod
-    def create_control(parent: Union[ttk.LabelFrame, ttk.Frame], name: str, options: Dict):
+    def _create_control(self, parent: Union[ttk.LabelFrame, ttk.Frame], name: str, widget_options: Dict):
         """Create a control in the parent frame based on the control type and options."""
-        control_type = options["type"]
+        control_type = widget_options["type"]
 
         if control_type == "button":
-            control = ttk.Button(parent, text=name, command=options["command"])
+            control = ttk.Button(parent, text=name, command=widget_options["command"])
 
         elif control_type == "entry":
             control = ttk.Entry(parent)
-            control.insert(index=0, string=options["value"])
+            control.insert(index=0, string=widget_options["value"])
 
         elif control_type == "combobox":
-            control = ttk.Combobox(parent, values=options["value"])
+            control = ttk.Combobox(parent, values=widget_options["value"])
 
         elif control_type == "filedialog":
             # add a frame with a text entry box and a button
             frame = ttk.Frame(parent)
             frame.pack(padx=0, pady=0, fill='x')
             control = ttk.Entry(frame)
-            control.insert(index=0, string=options["value"])
+            control.insert(index=0, string=widget_options["value"])
             control.pack(side=tk.LEFT, fill='x', expand=True)  # Make the entry box stretch wider
             button = ttk.Button(frame, text="Browse", command=browse_file)
-            button.pack(side=tk.LEFT, padx=10)
+            button.pack(side=tk.LEFT, padx=4)
 
         elif control_type == "label":
-            control = ttk.Label(parent, text=options["text"])
+            control = ttk.Label(parent, text=widget_options["text"])
 
-        elif control_type == "custom":
-            control = options["custom_func"](parent)
+        elif control_type == "savebox":
+            # add a frame with a combobox and two buttons
+            frame = ttk.Frame(parent)
+            frame.pack(padx=0, pady=0, fill='x')
+            control = ttk.Combobox(frame, values=widget_options["value"])
+            control.pack(side=tk.LEFT, fill='x', expand=True)
+            button = ttk.Button(frame, text="Save", command=save_config_file)
+            button.pack(side=tk.LEFT, padx=0)
+            button = ttk.Button(frame, text="Save As", command=save_as_config_file)
+            button.pack(side=tk.LEFT, padx=4)
+
+            # bind a command to the combobox
+            control.bind("<<ComboboxSelected>>", lambda event: update_config(event, control, self.config_widgets))
 
         else:
             raise Exception(f"Invalid control type: {control_type}")
 
         return control
 
-    def load_config_from_file(self, config_file_path: str):
-        """Load a json config file from the specified path."""
-        with open(config_file_path, 'r') as file:
-            return json.load(file)
-
-    def save_config_to_file(self):
-        """Read settings from the GUI and save them to a config file."""
-        # Initialize an empty dictionary to store the config
+    def update_current_settings(self):
+        """Get the current settings from the GUI."""
         config = {}
 
         # Iterate over the frames in the config frame
         for frame_name, frame_controls in self.config_widgets.items():
-            # Initialize an empty dictionary to store the settings for this frame
             frame_config = {}
 
             # Iterate over the controls in the frame
             for control_name, control_options in frame_controls.items():
-                # Get the control widget
                 control = control_options["widget"]
 
                 # Get the value from the control widget
@@ -328,21 +307,32 @@ class GUI:
                 else:
                     continue  # Skip non-entry widgets
 
-                # Add the value to the frame config
                 frame_config[control_name] = value
 
-            # Add the frame config to the main config
             config[frame_name] = frame_config
 
-        # Convert the config dictionary to a JSON string
-        config_json = json.dumps(config, indent=4)
+        self.current_settings = config
+
+    @staticmethod
+    def load_config_from_file(config_file_path: str):
+        """Load a json config file from the specified path."""
+        try:
+            with open(config_file_path, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            messagebox.showerror("Error", f"File not found: {config_file_path}")
+        except json.JSONDecodeError:
+            messagebox.showerror("Error", f"Invalid JSON file: {config_file_path}")
+
+    def save_config_to_file(self):
+        """Read settings from the GUI and save them to a config file."""
 
         # Open a file dialog to choose where to save the config file
         config_file_path = filedialog.asksaveasfilename(defaultextension=".json")
 
         # Save the config to the chosen file
         with open(config_file_path, 'w') as file:
-            file.write(config_json)
+            json.dump(config, file, indent=4)
 
     def load_logo(self):
         """Load the logo image and set the background color to match the logo."""
@@ -353,7 +343,7 @@ class GUI:
 
             # Create a frame for the logo
             logo_frame = ttk.Frame(self.master)
-            logo_frame.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
+            logo_frame.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
 
             # Add the logo to the frame
             logo = ttk.Label(logo_frame, image=self.logo_image)
@@ -404,8 +394,8 @@ def make_default_dict():
 # Run as script
 
 if __name__ == "__main__":
-    run_gui()
-    # make_default_dict()
+    # run_gui()
+    make_default_dict()
 
 # =====================================
 # Todos

@@ -5,19 +5,25 @@ clicks the "Run" button. The GUI is used to create a config file, which is then 
 # Imports
 
 import os
+import tkinter.messagebox
 from threading import Thread
 from time import sleep
-from typing import Dict, Any
+from typing import Dict, Any, List
 
+import logging
 import cv2
 import neoapi
 import numpy as np
 import serial
 import tifffile as tf
 
+# ======================================================================================================================
+# Classes
 
 # ======================================================================================================================
 # Main Program Loop
+logging_level = logging.INFO
+
 
 def run(config: Dict[str, Any]):
     """Run the DIC Capture software with the given config file path and record mode.
@@ -25,32 +31,32 @@ def run(config: Dict[str, Any]):
     Example config file:
     {
         "Record Mode": false,
-        "IO Config": {
-            "Output Folder": "dic-capture output",
-            "Test ID": "Test_ID_default"
+        "I/O": {
+            "Config File": [
+                "default_config.json"
+            ],
+            "Test ID": "Test_ID_20240112_154944",
+            "Output Folder": "C:\\Users\\SLTDAN002\\PycharmProjects\\dic_capture\\dic_capture"
         },
-        "Arduino Config": {
+        "Arduino": {
             "Choose COM Port:": [
-                "No COM ports available"
+                "COM1",
+                "COM2"
             ],
-            "Baud Rate": "",
-            "Max Buffer": ""
+            "Baud Rate": 115200,
+            "Max Buffer": 3
         },
-        "Camera 1 Config": {
-            "Camera Source": [
-                "Camera auto-detect not yet implemented."
-            ],
-            "Exposure Time (ms)": "",
-            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+        "Camera 1": {
+            "Camera Source": "P1-6",
+            "Exposure Time (ms)": 1.6,
+            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": "0, 0.1"
         },
-        "Camera 2 Config": {
-            "Camera Source": [
-                "Camera auto-detect not yet implemented."
-            ],
-            "Exposure Time (ms)": "",
-            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+        "Camera 2": {
+            "Camera Source": "P1-5",
+            "Exposure Time (ms)": 1.6,
+            "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": "0, 0.1"
         },
-        "Camera 3 Config": {
+        "Camera 3": {
             "Camera Source": [
                 "Camera auto-detect not yet implemented."
             ],
@@ -60,57 +66,82 @@ def run(config: Dict[str, Any]):
     }
     """
     # Extract the IO settings from config
-    output_folder = config["IO Config"]["Output Folder"]
-    test_id = config["IO Config"]["Test ID"]
+    working_folder: str = config["I/O"]["Working Folder"]
+    config_file: str = config["I/O"]["Config File"]
+    test_id: str = config["I/O"]["Test ID"]
 
     # Extract the Arduino settings from config
-    arduino_com_port = config["Arduino Config"]["Choose COM Port:"]
-    arduino_baud_rate = config["Arduino Config"]["Baud Rate"]
-    arduino_max_buffer = config["Arduino Config"]["Max Buffer"]
+    arduino_com_port: int = config["Arduino"]["Choose COM Port:"]
+    arduino_baud_rate: int = config["Arduino"]["Baud Rate"]
+    arduino_max_buffer: int = config["Arduino"]["Max Buffer"]
 
     # Extract the Camera 1 settings from config
-    cam1_src = config["Camera 1 Config"]["Camera Source"]
-    cam1_exposure_time_ms = config["Camera 1 Config"]["Exposure Time (ms)"]
-    cam1_fps_stages = config["Camera 1 Config"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+    cam1_src: str = config["Camera 1"]["Camera Source"]
+    cam1_exposure_time_ms = config["Camera 1"]["Exposure Time (ms)"]
+    cam1_stages = config["Camera 1"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+    cam1_fps_stages: List[float] = list(map(float, cam1_stages.split(', '))) if cam1_stages else []
 
     # Extract the Camera 2 settings from config
-    cam2_src = config["Camera 2 Config"]["Camera Source"]
-    cam2_exposure_time_ms = config["Camera 2 Config"]["Exposure Time (ms)"]
-    cam2_fps_stages = config["Camera 2 Config"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+    cam2_src: str = config["Camera 2"]["Camera Source"]
+    cam2_exposure_time_ms = config["Camera 2"]["Exposure Time (ms)"]
+    cam2_stages = config["Camera 2"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+    cam2_fps_stages: List[float] = list(map(float, cam2_stages.split(', '))) if cam2_stages else []
 
     # Extract the Camera 3 settings from config
-    cam3_source = config["Camera 3 Config"]["Camera Source"]
-    cam3_exposure_time_ms = config["Camera 3 Config"]["Exposure Time (ms)"]
-    cam3_fps_stages = config["Camera 3 Config"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+    cam3_source: str = config["Camera 3"]["Camera Source"]
+    cam3_exposure_time_ms: float = config["Camera 3"]["Exposure Time (ms)"]
+    cam3_stages: str = config["Camera 3"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
+    cam3_fps_stages: List[float] = list(map(float, cam3_stages.split(', '))) if cam3_stages else []
 
     # Output directories
-    raw_data_save_dir = output_folder + '/Raw_Data'  # this is hardcoded
-    cam_1_save_dir = output_folder + '/Camera_1'
-    cam_2_save_dir = output_folder + '/Camera_2'
-    cam_3_save_dir = output_folder + '/Camera_3'
-    synced_data_save_dir = output_folder + '/Synced_Data'
-    dic_results_save_dir = output_folder + '/DIC_Results'
-
-    output_subfolders = [raw_data_save_dir, cam_1_save_dir, cam_2_save_dir, cam_3_save_dir, synced_data_save_dir,
-                         dic_results_save_dir]
+    raw_data_save_dir = os.path.join(working_folder, test_id, 'Raw_Data')
+    cam_1_save_dir = os.path.join(working_folder, test_id, 'Camera_1')
+    cam_2_save_dir = os.path.join(working_folder, test_id, 'Camera_2')
+    cam_3_save_dir = os.path.join(working_folder, test_id, 'Camera_3')
+    synced_data_save_dir = os.path.join(working_folder, test_id, 'Synced_Data')
+    dic_results_save_dir = os.path.join(working_folder, test_id, 'DIC_Results')
+    log_save_dir = os.path.join(working_folder, test_id, 'Logs')
 
     # Create the output folder and sub-folders if record mode is true
-    record_mode = config["Record Mode"]
+    record_mode: bool = config["Record Mode"]
     if record_mode:
+        # Try to create a folder for the test ID, stop running if folder already exists
+        if os.path.exists(test_id):
+            tkinter.messagebox.showerror("Error", "Folder already exists.")
+            return 1
+        else:
+            os.makedirs(test_id)
+        # Create the sub-folders
+        output_subfolders = [raw_data_save_dir, cam_1_save_dir, cam_2_save_dir, cam_3_save_dir, synced_data_save_dir,
+                             dic_results_save_dir, log_save_dir]
         for folder in output_subfolders:
             os.makedirs(folder, exist_ok=True)
+    else:  # If record mode is false, don't create any folders
+        pass
+
+        # Set up logging
+    if record_mode:
+        logging.basicConfig(filename=os.path.join(log_save_dir, 'dic capture run record mode.log'), filemode='w', format='%(name)s - %(levelname)s - %(message)s',
+                            level=logging.INFO)
+    else:
+        logging.basicConfig(level=logging.CRITICAL)
+
+    logging.info('Starting DIC Capture run function.')
 
     # Create a serial connection to the Arduino
-    ser = serial.Serial(arduino_com_port, arduino_baud_rate, timeout=2)  # add timeout setting to GUI?
-
-    # todo: update program below
+    try:
+        ser = serial.Serial(arduino_com_port, arduino_baud_rate, timeout=2)
+    except serial.SerialException as e:
+        logging.error(f'Error creating serial connection to Arduino: {e}')
+        tkinter.messagebox.showerror("Error", "Error creating serial connection to Arduino.")
+        return 1
 
     # OLD VARIABLE NAMES HERE
     fps_values = cam1_fps_stages
     exposure_time_ms = cam1_exposure_time_ms
     max_buffer_arr = arduino_max_buffer
 
-    def hardware_tigger():
+    def hardware_trigger():
         # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
         sleep(1)
         TCTN1_Values = ''
@@ -139,9 +170,9 @@ def run(config: Dict[str, Any]):
             except:
                 sleep(0.01)
 
-        while (record_mode == True):
+        while record_mode:
             try:
-                while (ser.inWaiting() == 0):
+                while ser.inWaiting() == 0:
                     pass
                 qValue = ser.read(ser.in_waiting)
 
@@ -152,7 +183,8 @@ def run(config: Dict[str, Any]):
                 pass
 
     class vStream():
-        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir):
+        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir,
+                     exposure_time_ms):
             self.buffer_arr_max = buffer_arr_max
             self.timeOut_ms = timeOut_ms
             self.windowName = windowName
@@ -478,7 +510,7 @@ def run(config: Dict[str, Any]):
         img_hist = cv2.flip(img_hist, 0)
         return img_hist
 
-    threadTrigger = Thread(target=hardware_tigger, args=())
+    threadTrigger = Thread(target=hardware_trigger, args=())
     threadTrigger.daemon = True
     threadTrigger.start()
 

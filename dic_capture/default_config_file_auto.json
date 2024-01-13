@@ -1,9 +1,10 @@
 {
+    "Record Mode": false,
     "I/O": {
         "Config File": [
             "default_config.json"
         ],
-        "Test ID": "Test_ID_20240112_154422",
+        "Test ID": "Test_ID_20240112_155721",
         "Output Folder": "C:\\Users\\SLTDAN002\\PycharmProjects\\dic_capture\\dic_capture"
     },
     "Arduino": {

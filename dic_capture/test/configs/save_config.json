@@ -1,0 +1,27 @@
+{
+    "I/O": {
+        "Working Folder": "C:/Users/SLTDAN002/PycharmProjects/dic_capture/dic_capture/test",
+        "Config File": "default_config.json",
+        "Test ID": "Test_ID_20240113"
+    },
+    "Arduino": {
+        "Choose COM Port:": "",
+        "Baud Rate": "115200",
+        "Max Buffer": "3"
+    },
+    "Camera 1": {
+        "Camera Source": "P1-6",
+        "Exposure Time (ms)": "1.6",
+        "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": "0, 0.1"
+    },
+    "Camera 2": {
+        "Camera Source": "P1-5",
+        "Exposure Time (ms)": "1.6",
+        "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": "0, 0.1"
+    },
+    "Camera 3": {
+        "Camera Source": "{Camera auto-detect not yet implemented.}",
+        "Exposure Time (ms)": "",
+        "FPS Stages (e.g. \"0, 0.1, 0, 0.1\")": ""
+    }
+}

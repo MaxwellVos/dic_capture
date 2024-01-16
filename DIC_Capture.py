@@ -3,6 +3,7 @@
 # Capturing software used in custom DIC standalone system
 import sys
 import time
+/sda
 import serial
 import csv
 import cv2

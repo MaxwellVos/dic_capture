@@ -86,6 +86,8 @@ def run(config: Dict[str, Any]):
     arduino_com_port: int = config["Arduino"]["Choose COM Port:"]
     arduino_baud_rate: int = config["Arduino"]["Baud Rate"]
     arduino_max_buffer: int = config["Arduino"]["Max Buffer"]
+    trigger_period_stages_ms: str = config["Trigger speed per stage (ms)"]["eg: '200,1000,0,500'"]
+    
 
     # Extract the Camera 1 settings from config
     cam1_src: str = config["Camera 1"]["Camera Source"]
@@ -160,27 +162,15 @@ def run(config: Dict[str, Any]):
     exposure_time_ms = cam1_exposure_time_ms
     max_buffer_arr = arduino_max_buffer
 
-    def hardware_trigger():
+    def hardware_trigger(trigger_period_stages_ms):
         # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
         print('Waiting for serial connection to initialize.')
         logging.info('Waiting for serial connection to initialize.')
         sleep(1)
-        TCTN1_Values = ''
-        TCTN1_temp = ''
-
-        for i in fps_values:
-            if i == 0:
-                TCTN1_temp = '0'
-            else:
-                TCTN1_temp = str(
-                    round(
-                        65536 - 16000000 / (1024 * i * 2)))  # converts frame rate to arduino clock overflow start value
-            TCTN1_Values = TCTN1_Values + TCTN1_temp + ', '  # adds this value to a string which will be sent to the arduino
-        TCTN1_Values = TCTN1_Values[: -2]  # delets the ', ' from the end of the string befor sending
 
         while True:
             try:  # reads serial output from audrino
-                ser.write(TCTN1_Values.encode())
+                ser.write(trigger_period_stages_ms.encode())
                 qValue = ser.readline().strip().decode('ascii')
                 print('serial output: ', qValue)
                 if qValue == "RECIEVED" and (record_mode == True):
@@ -542,7 +532,7 @@ def run(config: Dict[str, Any]):
 
     logging.info('Starting hardware trigger thread.')
 
-    threadTrigger = Thread(target=hardware_trigger, args=())
+    threadTrigger = Thread(target=hardware_trigger(trigger_period_stages_ms), args=())
     threadTrigger.daemon = True
     threadTrigger.start()
 

@@ -30,7 +30,7 @@ def get_cameras_port_ID():
     devices = []
     for device in neoapi.CamInfoList_Get():
         try:
-            devices.append(device.GetUSBPortID())
+            devices.append(device.GetUSBPortID()+'_SN:'+device.GetSerialNumber())
         except neoapi.NeoException as exc:
             print('error: ', exc)
     return devices
@@ -83,7 +83,7 @@ class GUI:
                 "Baud Rate": dict(
                     type="entry", value=250000
                 ),
-                "Max Buffer": dict(
+                "Image Buffer": dict(
                     type="entry", value=3
                 ),
                 'Trigger speed per stage (ms)': dict(

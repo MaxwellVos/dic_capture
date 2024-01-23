@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Changed camera FPS to arduino triggering in ms">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dic_capture/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/gui.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -206,7 +209,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706018666783</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Changed camera FPS to arduino triggering in ms">
+      <option name="closed" value="true" />
+      <created>1706019018203</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1706019018203</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -216,6 +227,7 @@
     <MESSAGE value="Updating local project env" />
     <MESSAGE value="populated requirements workaround and uploaded .whl38" />
     <MESSAGE value="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
+    <MESSAGE value="Changed camera FPS to arduino triggering in ms" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed camera FPS to arduino triggering in ms" />
   </component>
 </project>

@@ -24,6 +24,9 @@ import neoapi
 
 DIC_CAPTURE_VERSION = "0.0.3"
 
+global running
+running = True
+
 # =====================================
 # Helper functions for gui. See gui class below.
 def get_cameras_port_ID():
@@ -159,7 +162,6 @@ class GUI:
         elif control_type == "combobox":
             control = ttk.Combobox(parent, values=widget_options["value"])
             try:
-                print(name)
                 control.current(0)
             except:
                 pass
@@ -319,8 +321,12 @@ class GUI:
         self.current_settings["Record Mode"] = True
         run(self.current_settings)
 
+
     def run_test_mode(self):
+        running = False
+
         """Set the config to test mode and run the program."""
+
         if not self.working_folder:
             messagebox.showerror("Error", "Please select a working folder before running the program.")
             return
@@ -328,7 +334,10 @@ class GUI:
         # update current settings to match current gui settings
         self._update_current_settings()
         self.current_settings["Record Mode"] = False
+
         run(self.current_settings)
+        root.destroy()
+
 
     def create_run_frame(self):
         """Create a frame for running the program."""
@@ -421,11 +430,13 @@ class GUI:
 # =====================================
 # Main program function
 
-def run_gui():
+def run_gui(running):
     """Run the program by opening the GUI."""
+    global root
     root = ThemedTk(theme="plastik")
     app = GUI(root)
     root.mainloop()
+
 
 
 # =====================================
@@ -462,7 +473,7 @@ def make_default_dict():
 windll.shcore.SetProcessDpiAwareness(1)
 
 if __name__ == "__main__":
-    run_gui()
+    run_gui(running)
     # make_default_dict()
 
 # =====================================

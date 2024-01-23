@@ -24,19 +24,6 @@ import tifffile as tf
 # Main Program Loop
 logging_level = logging.INFO
 
-def FindDevices():
-    devices = []
-    for device in neoapi.CamInfoList_Get():
-        try:
-            devices.append(device.GetSerialNumber())
-            devices.append(device.GetUSBPortID())
-        except neoapi.NeoException as exc:
-            print('error: ', exc)
-    print(devices, "device(s) connected!")
-    return devices
-
-devices = FindDevices()
-
 def run(config: Dict[str, Any]):
     """Run the DIC Capture software with the given config file path and record mode.
 
@@ -90,15 +77,16 @@ def run(config: Dict[str, Any]):
     
 
     # Extract the Camera 1 settings from config
-    cam1_src: str = config["Camera 1"]["Camera Source"]
+    cam1_src: str = config["Camera 1"]["Camera Source"][:4]
+    print(cam1_src)
     cam1_exposure_time_ms = config["Camera 1"]["Exposure Time (ms)"]
 
     # Extract the Camera 2 settings from config
-    cam2_src: str = config["Camera 2"]["Camera Source"]
+    cam2_src: str = config["Camera 2"]["Camera Source"][:4]
     cam2_exposure_time_ms = config["Camera 2"]["Exposure Time (ms)"]
 
     # Extract the Camera 3 settings from config
-    cam3_source: str = config["Camera 3"]["Camera Source"]
+    cam3_source: str = config["Camera 3"]["Camera Source"][:4]
     cam3_exposure_time_ms: float = config["Camera 3"]["Exposure Time (ms)"]
 
     # Output directories
@@ -563,14 +551,6 @@ def run(config: Dict[str, Any]):
             cv2.setMouseCallback(cam2.windowName, cam2.click_event)
 
         except Exception as e:
-            logging.error(f'Error while displaying frames: {e}')
-            print('display frame error')
-            # print('Loading Camera')
-            # sleep(0.2)
-            error_count = error_count + 1
-            if error_count > 100:
-                print('error count exceeded')
-                break
             pass
 
         if cv2.waitKey(10) == "TEMPORTY BLOCK":  # ord('q'):

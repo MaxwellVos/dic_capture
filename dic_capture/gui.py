@@ -81,10 +81,13 @@ class GUI:
                     type="combobox", value=get_available_com_ports()
                 ),
                 "Baud Rate": dict(
-                    type="entry", value=115200
+                    type="entry", value=250000
                 ),
                 "Max Buffer": dict(
                     type="entry", value=3
+                ),
+                'Trigger speed per stage (ms)': dict(
+                    type="entry", value="eg: '200,1000,0,500'"
                 ),
             },
             "Camera 1": {
@@ -94,12 +97,7 @@ class GUI:
                 "Exposure Time (ms)": dict(
                     type="entry", value=1.6
                 ),
-                'FPS Stages (e.g. "0, 0.1, 0, 0.1")': dict(
-                    type="entry", value="0, 0.1"
-                ),
-                'ms Stages (e.g. "100,1000,0,500")': dict(
-                    type="entry", value="100,1000,0,500"
-                ),
+
             },
             "Camera 2": {
                 "Camera Source": dict(
@@ -108,9 +106,7 @@ class GUI:
                 "Exposure Time (ms)": dict(
                     type="entry", value=1.6
                 ),
-                'FPS Stages (e.g. "0, 0.1, 0, 0.1")': dict(
-                    type="entry", value="0, 0.1"
-                ),
+
             },
             "Camera 3": {
                 "Camera Source": dict(
@@ -119,9 +115,7 @@ class GUI:
                 "Exposure Time (ms)": dict(
                     type="entry", value=""
                 ),
-                'FPS Stages (e.g. "0, 0.1, 0, 0.1")': dict(
-                    type="entry", value=""
-                ),
+
             },
         }
 

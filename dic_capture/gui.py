@@ -8,6 +8,7 @@ import tkinter as tk
 from datetime import datetime
 from tkinter import ttk, filedialog, messagebox
 from typing import Dict, Union
+from ctypes import windll
 
 from PIL import Image
 from PIL import ImageTk
@@ -16,26 +17,36 @@ from ttkthemes import ThemedTk
 
 from dic_capture.run import run
 
+import neoapi
+
 # =====================================
 # Global variables
 
 DIC_CAPTURE_VERSION = "0.0.3"
 
-
 # =====================================
 # Helper functions for gui. See gui class below.
+def get_cameras_port_ID():
+    devices = []
+    for device in neoapi.CamInfoList_Get():
+        try:
+            devices.append(device.GetUSBPortID())
+        except neoapi.NeoException as exc:
+            print('error: ', exc)
+    return devices
 
+def get_cameras_SN():
+    devices = []
+    for device in neoapi.CamInfoList_Get():
+        try:
+            devices.append(device.GetSerialNumber())
+        except neoapi.NeoException as exc:
+            print('error: ', exc)
+    return devices
 
 def get_available_com_ports():
     """Get a list of available COM ports."""
     return [str(port.device) for port in comports()]
-
-
-def get_available_cameras():
-    """Get a list of available cameras."""
-    # todo: update this to use neoapi to check for available cameras
-    return ["Camera auto-detect not yet implemented."]
-
 
 def browse_file(widget):
     """Open a file dialog and insert the selected file path into the specified widget."""
@@ -78,7 +89,7 @@ class GUI:
             },
             "Camera 1": {
                 "Camera Source": dict(
-                    type="combobox", value="P1-6"
+                    type="combobox", value=get_cameras_port_ID()
                 ),
                 "Exposure Time (ms)": dict(
                     type="entry", value=1.6
@@ -92,7 +103,7 @@ class GUI:
             },
             "Camera 2": {
                 "Camera Source": dict(
-                    type="combobox", value="P1-5"
+                    type="combobox", value=get_cameras_port_ID()
                 ),
                 "Exposure Time (ms)": dict(
                     type="entry", value=1.6
@@ -103,7 +114,7 @@ class GUI:
             },
             "Camera 3": {
                 "Camera Source": dict(
-                    type="combobox", value=get_available_cameras()
+                    type="combobox", value=get_cameras_port_ID()
                 ),
                 "Exposure Time (ms)": dict(
                     type="entry", value=""
@@ -447,6 +458,9 @@ def make_default_dict():
 
 # =====================================
 # Run as script
+
+# fixes tk resolution issue
+windll.shcore.SetProcessDpiAwareness(1)
 
 if __name__ == "__main__":
     run_gui()

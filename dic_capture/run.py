@@ -24,6 +24,18 @@ import tifffile as tf
 # Main Program Loop
 logging_level = logging.INFO
 
+def FindDevices():
+    devices = []
+    for device in neoapi.CamInfoList_Get():
+        try:
+            devices.append(device.GetSerialNumber())
+            devices.append(device.GetUSBPortID())
+        except neoapi.NeoException as exc:
+            print('error: ', exc)
+    print(devices, "device(s) connected!")
+    return devices
+
+devices = FindDevices()
 
 def run(config: Dict[str, Any]):
     """Run the DIC Capture software with the given config file path and record mode.

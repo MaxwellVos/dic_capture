@@ -1,0 +1,419 @@
+root - INFO - Starting DIC Capture run function.
+root - ERROR - Error creating serial connection to Arduino: could not open port '': FileNotFoundError(2, 'The system cannot find the path specified.', None, 3)
+root - INFO - Starting hardware trigger thread.
+root - INFO - Creating camera objects.
+root - INFO - Waiting for serial connection to initialize.
+root - ERROR - Error creating camera objects: NotConnectedException: No device with 'P1-6' found.
+root - ERROR - Error reading serial output from Arduino: free variable 'ser' referenced before assignment in enclosing scope
+root - ERROR - Error reading serial output from Arduino in second block: free variable 'ser' referenced before assignment in enclosing scope
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Starting DIC Capture run function.
+root - ERROR - Error creating serial connection to Arduino: could not open port '': FileNotFoundError(2, 'The system cannot find the path specified.', None, 3)
+root - INFO - Starting hardware trigger thread.
+root - INFO - Waiting for serial connection to initialize.
+root - INFO - Creating camera objects.
+root - ERROR - Error creating camera objects: NotConnectedException: No device with 'P1-6' found.
+root - ERROR - Error reading serial output from Arduino: free variable 'ser' referenced before assignment in enclosing scope
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment
+root - INFO - Displaying frames.
+root - ERROR - Error while displaying frames: local variable 'cam1' referenced before assignment

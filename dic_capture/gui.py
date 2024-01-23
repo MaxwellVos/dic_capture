@@ -86,8 +86,8 @@ class GUI:
                 "Image Buffer": dict(
                     type="entry", value=3
                 ),
-                'Trigger speed per stage (ms)': dict(
-                    type="entry", value="eg: '200,1000,0,500'"
+                "Trigger speed per stage (ms)": dict(
+                    type="entry", value="200,1000,0,500"
                 ),
             },
             "Camera 1": {

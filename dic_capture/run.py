@@ -85,29 +85,21 @@ def run(config: Dict[str, Any]):
     # Extract the Arduino settings from config
     arduino_com_port: int = config["Arduino"]["Choose COM Port:"]
     arduino_baud_rate: int = config["Arduino"]["Baud Rate"]
-    arduino_max_buffer: int = config["Arduino"]["Max Buffer"]
-    trigger_period_stages_ms: str = config["Trigger speed per stage (ms)"]["eg: '200,1000,0,500'"]
+    arduino_max_buffer: int = config["Arduino"]["Image Buffer"]
+    trigger_period_stages_ms: str = config["Arduino"]["Trigger speed per stage (ms)"]
     
 
     # Extract the Camera 1 settings from config
     cam1_src: str = config["Camera 1"]["Camera Source"]
     cam1_exposure_time_ms = config["Camera 1"]["Exposure Time (ms)"]
-    cam1_stages = config["Camera 1"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
-    cam1_fps_stages: List[float] = list(map(float, cam1_stages.split(', '))) if cam1_stages else []
-    cam1_ms_example = config["Camera 1"][r'ms Stages (e.g. "100,1000,0,500")']
-    print(cam1_ms_example)
 
     # Extract the Camera 2 settings from config
     cam2_src: str = config["Camera 2"]["Camera Source"]
     cam2_exposure_time_ms = config["Camera 2"]["Exposure Time (ms)"]
-    cam2_stages = config["Camera 2"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
-    cam2_fps_stages: List[float] = list(map(float, cam2_stages.split(', '))) if cam2_stages else []
 
     # Extract the Camera 3 settings from config
     cam3_source: str = config["Camera 3"]["Camera Source"]
     cam3_exposure_time_ms: float = config["Camera 3"]["Exposure Time (ms)"]
-    cam3_stages: str = config["Camera 3"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
-    cam3_fps_stages: List[float] = list(map(float, cam3_stages.split(', '))) if cam3_stages else []
 
     # Output directories
     test_id_dir = os.path.join(working_folder, test_id)
@@ -158,11 +150,11 @@ def run(config: Dict[str, Any]):
         pass
 
     # OLD VARIABLE NAMES HERE
-    fps_values = cam1_fps_stages
     exposure_time_ms = cam1_exposure_time_ms
     max_buffer_arr = arduino_max_buffer
 
     def hardware_trigger(trigger_period_stages_ms):
+        print(trigger_period_stages_ms)
         # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
         print('Waiting for serial connection to initialize.')
         logging.info('Waiting for serial connection to initialize.')

@@ -3,19 +3,16 @@
 # Capturing software used in custom DIC standalone system
 import sys
 import time
-/sda
+
 import serial
 import csv
 import cv2
 import neoapi
-import matplotlib.pyplot as plt
 import numpy as np
 import math
-import pyfirmata.util
 import tifffile as tf
 import pip
 from threading import Thread
-from pyfirmata import Arduino, util
 from time import sleep
 import easygui
 import os
@@ -34,11 +31,11 @@ global test_ID
 test_ID = ''
 
 if record_mode == True:
-    # fpsValues = [0,0.25,1,32,1,0.2,0] # pin sequence for fps, iterates array index everytime quench 4 state is changed.
-    # fpsValues = [0, 1, 0.125, 0.125, 0, 0.125]  # Matthew Inconel RBDT
+    # trigger_period_ms = [0,0.25,1,32,1,0.2,0] # pin sequence for fps, iterates array index everytime quench 4 state is changed.
+    # trigger_period_ms = [0, 1, 0.125, 0.125, 0, 0.125]  # Matthew Inconel RBDT
 
-    # fpsValues = [0, 0, 0.125, 0]  # use this for calibration image capture
-    fpsValues = [0, 0.125, 0.125, 0.125, 0, 0.125]  # Matthew Inconel Testing
+    # trigger_period_ms = [0, 0, 0.125, 0]  # use this for calibration image capture
+    trigger_period_ms = [0, 4000, 4000, 4000, 0, 4000]  # Matthew Inconel Testing
 
     max_buffer_arr = 3
 
@@ -62,7 +59,7 @@ if record_mode == True:
     os.mkdir(DIC_results_save_dir, 0o666)
 else:
     max_buffer_arr = 3
-    fpsValues = [0, 20, 0]
+    trigger_period_ms = [200, 0, 1000, 0, 600] #enter in ms for now
     save_path = ''
     test_ID = ''
     raw_data_save_dir = ''
@@ -72,7 +69,7 @@ else:
 cam1_src = 'P1-6'  # 'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
 cam2_src = 'P1-5'  # 'P1-6' USB 3 port at back of laptop, 'P1-5' is USB C to USB 3.1 adaptor
 
-ser = serial.Serial('COM4', 115200, timeout=2)
+ser = serial.Serial('COM4', 250000, timeout=2)
 
 
 def hardware_tigger():
@@ -81,12 +78,11 @@ def hardware_tigger():
     TCTN1_Values = ''
     TCTN1_temp = ''
 
-    for i in fpsValues:
+    for i in trigger_period_ms:
         if i == 0:
             TCTN1_temp = '0'
         else:
-            TCTN1_temp = str(
-                round(65536 - 16000000 / (1024 * i * 2)))  # converts frame rate to arduino clock overflow start value
+            TCTN1_temp = str(i)  # converts frame rate to arduino clock overflow start value
         TCTN1_Values = TCTN1_Values + TCTN1_temp + ', '  # adds this value to a string which will be sent to the arduino
     TCTN1_Values = TCTN1_Values[: -2]  # delets the ', ' from the end of the string befor sending
 

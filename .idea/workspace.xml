@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="made gui period list be compatable with the run hardware trigger function in ms">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="got the gui and run to talk nicely">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -226,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706020552086</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="got the gui and run to talk nicely">
+      <option name="closed" value="true" />
+      <created>1706021331139</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1706021331139</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -238,6 +245,7 @@
     <MESSAGE value="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
     <MESSAGE value="Changed camera FPS to arduino triggering in ms" />
     <MESSAGE value="made gui period list be compatable with the run hardware trigger function in ms" />
-    <option name="LAST_COMMIT_MESSAGE" value="made gui period list be compatable with the run hardware trigger function in ms" />
+    <MESSAGE value="got the gui and run to talk nicely" />
+    <option name="LAST_COMMIT_MESSAGE" value="got the gui and run to talk nicely" />
   </component>
 </project>

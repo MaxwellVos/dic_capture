@@ -78,7 +78,7 @@ class GUI:
             },
             "Arduino": {
                 "Choose COM Port:": dict(
-                    type="combobox", value=get_available_com_ports()
+                    type="combobox", value=get_available_com_ports(), current = 0
                 ),
                 "Baud Rate": dict(
                     type="entry", value=250000
@@ -158,6 +158,11 @@ class GUI:
 
         elif control_type == "combobox":
             control = ttk.Combobox(parent, values=widget_options["value"])
+            try:
+                print(name)
+                control.current(0)
+            except:
+                pass
 
         elif control_type == "filedialog":
             # add a frame with a text entry box and a button

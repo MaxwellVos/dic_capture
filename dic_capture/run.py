@@ -36,7 +36,7 @@ def run(config: Dict[str, Any]):
                 "default_config.json"
             ],
             "Test ID": "Test_ID_20240112_154944",
-            "Output Folder": "C:\\Users\\SLTDAN002\\PycharmProjects\\dic_capture\\dic_capture"
+            "Output Folder":
         },
         "Arduino": {
             "Choose COM Port:": [
@@ -80,6 +80,8 @@ def run(config: Dict[str, Any]):
     cam1_exposure_time_ms = config["Camera 1"]["Exposure Time (ms)"]
     cam1_stages = config["Camera 1"]["FPS Stages (e.g. \"0, 0.1, 0, 0.1\")"]
     cam1_fps_stages: List[float] = list(map(float, cam1_stages.split(', '))) if cam1_stages else []
+    cam1_ms_example = config["Camera 1"][r'ms Stages (e.g. "100,1000,0,500")']
+    print(cam1_ms_example)
 
     # Extract the Camera 2 settings from config
     cam2_src: str = config["Camera 2"]["Camera Source"]

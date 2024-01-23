@@ -46,6 +46,7 @@ def browse_file(widget):
 
 # =====================================
 # GUI class
+#gui layout settings
 packing = dict(padx=4, pady=10, fill='x')
 
 
@@ -84,6 +85,9 @@ class GUI:
                 ),
                 'FPS Stages (e.g. "0, 0.1, 0, 0.1")': dict(
                     type="entry", value="0, 0.1"
+                ),
+                'ms Stages (e.g. "100,1000,0,500")': dict(
+                    type="entry", value="100,1000,0,500"
                 ),
             },
             "Camera 2": {

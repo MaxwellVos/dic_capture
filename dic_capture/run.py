@@ -4,13 +4,13 @@ clicks the "Run" button. The GUI is used to create a config file, which is then 
 # ======================================================================================================================
 # Imports
 
+import logging
 import os
 import tkinter.messagebox
 from threading import Thread
 from time import sleep
 from typing import Dict, Any, List
 
-import logging
 import cv2
 import neoapi
 import numpy as np
@@ -94,6 +94,7 @@ def run(config: Dict[str, Any]):
     cam3_fps_stages: List[float] = list(map(float, cam3_stages.split(', '))) if cam3_stages else []
 
     # Output directories
+    test_id_dir = os.path.join(working_folder, test_id)
     raw_data_save_dir = os.path.join(working_folder, test_id, 'Raw_Data')
     cam_1_save_dir = os.path.join(working_folder, test_id, 'Camera_1')
     cam_2_save_dir = os.path.join(working_folder, test_id, 'Camera_2')
@@ -106,22 +107,24 @@ def run(config: Dict[str, Any]):
     record_mode: bool = config["Record Mode"]
     if record_mode:
         # Try to create a folder for the test ID, stop running if folder already exists
-        if os.path.exists(test_id):
-            tkinter.messagebox.showerror("Error", "Folder already exists.")
+        if os.path.exists(test_id_dir):
+            tkinter.messagebox.showerror("Error", f"Folder for test ID {test_id} already exists. Please choose a "
+                                                  f"different test ID.")
             return 1
         else:
-            os.makedirs(test_id)
+            os.makedirs(test_id_dir)
         # Create the sub-folders
         output_subfolders = [raw_data_save_dir, cam_1_save_dir, cam_2_save_dir, cam_3_save_dir, synced_data_save_dir,
                              dic_results_save_dir, log_save_dir]
         for folder in output_subfolders:
-            os.makedirs(folder, exist_ok=True)
+            os.makedirs(folder)
     else:  # If record mode is false, don't create any folders
         pass
 
         # Set up logging
     if record_mode:
-        logging.basicConfig(filename=os.path.join(log_save_dir, 'dic capture run record mode.log'), filemode='w', format='%(name)s - %(levelname)s - %(message)s',
+        logging.basicConfig(filename=os.path.join(log_save_dir, f'{test_id} dic-capture run log.log'), filemode='w',
+                            format='%(name)s - %(levelname)s - %(message)s',
                             level=logging.INFO)
     else:
         logging.basicConfig(level=logging.CRITICAL)
@@ -134,7 +137,9 @@ def run(config: Dict[str, Any]):
     except serial.SerialException as e:
         logging.error(f'Error creating serial connection to Arduino: {e}')
         tkinter.messagebox.showerror("Error", "Error creating serial connection to Arduino.")
-        return 1
+        # return 1
+    finally:
+        pass
 
     # OLD VARIABLE NAMES HERE
     fps_values = cam1_fps_stages
@@ -143,6 +148,8 @@ def run(config: Dict[str, Any]):
 
     def hardware_trigger():
         # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
+        print('Waiting for serial connection to initialize.')
+        logging.info('Waiting for serial connection to initialize.')
         sleep(1)
         TCTN1_Values = ''
         TCTN1_temp = ''
@@ -167,8 +174,11 @@ def run(config: Dict[str, Any]):
                         heading_write_ard = 'Frame' + '\t' + 'Time' + '\t' + 'State' + '\t' + 'Count' + '\t' + 'Last_QTime' + '\n'
                         f.write(heading_write_ard)  # headings for .txt file output
                     break
-            except:
+            except Exception as e:
+                logging.error(f'Error reading serial output from Arduino: {e}')
+                print('serial output error')
                 sleep(0.01)
+                break
 
         while record_mode:
             try:
@@ -179,12 +189,13 @@ def run(config: Dict[str, Any]):
                 with open(raw_data_save_dir + "/Arduino_Serial_Output_" + test_id + '.txt', 'a') as f:
                     f.write(qValue.decode('ascii'))
 
-            except:
-                pass
+            except Exception as e:
+                logging.error(f'Error reading serial output from Arduino in second block: {e}')
+                print('serial output error in second block')
+                break
 
     class vStream():
-        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir,
-                     exposure_time_ms):
+        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir):
             self.buffer_arr_max = buffer_arr_max
             self.timeOut_ms = timeOut_ms
             self.windowName = windowName
@@ -248,6 +259,8 @@ def run(config: Dict[str, Any]):
             self.cam_t0 = 0
 
         def click_event(self, event, x, y, flags, params):
+            logging.info('Click event detected.')
+
             self.event = event
             self.flags = flags
             self.params = params
@@ -265,6 +278,8 @@ def run(config: Dict[str, Any]):
                 self.clicked = self.clicked + 1
 
         def start_vStream(self):
+            logging.info('Starting camera thread.')
+
             self.thread.start()
             self.thread_array_read.start()
             self.thread_save_array.start()
@@ -353,6 +368,7 @@ def run(config: Dict[str, Any]):
 
 
                 except:
+                    logging.error('Error saving array.')
                     print('save array error')
 
         def displayFrame(self):
@@ -461,7 +477,7 @@ def run(config: Dict[str, Any]):
                         self.stopped = True
                 except:
                     pass
-                    # print('Video Show Exception')
+                    print('Video Show Exception')
 
         def stop(self):
             self.stopped = True
@@ -510,30 +526,60 @@ def run(config: Dict[str, Any]):
         img_hist = cv2.flip(img_hist, 0)
         return img_hist
 
+    logging.info('Starting hardware trigger thread.')
+
     threadTrigger = Thread(target=hardware_trigger, args=())
     threadTrigger.daemon = True
     threadTrigger.start()
 
     # (self,src,windowName, timeOut_ms)
-    cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir)
-    cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir)
+    try:
+        logging.info('Creating camera objects.')
 
-    cam1.start_vStream()
-    cam2.start_vStream()
+        cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir)
+        cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir)
+        # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
 
-    sleep(2)
+        logging.info('Starting camera threads.')
 
+        cam1.start_vStream()
+        cam2.start_vStream()
+
+        print('Waiting for cameras to initialize.')
+        logging.info('Waiting for cameras to initialize.')
+        sleep(2)
+
+    except Exception as e:
+        logging.error(f'Error creating camera objects: {e}')
+        tkinter.messagebox.showerror("Error", f"Error creating camera objects: {e}.")
+        # return 1
+
+    error_count = 0
     while True:
+
         try:
+            logging.info('Displaying frames.')
+
             cam1.displayFrame()
             cam2.displayFrame()
+
             cv2.setMouseCallback(cam1.windowName, cam1.click_event)
             cv2.setMouseCallback(cam2.windowName, cam2.click_event)
-        except:
+
+        except Exception as e:
+            logging.error(f'Error while displaying frames: {e}')
+            print('display frame error')
             # print('Loading Camera')
             # sleep(0.2)
+            error_count = error_count + 1
+            if error_count > 100:
+                print('error count exceeded')
+                break
             pass
+
         if cv2.waitKey(10) == "TEMPORTY BLOCK":  # ord('q'):
+            logging.info('Exiting program.')
+
             # cam1.capture.release()
             cam1.save_buffer_remainder()
             cv2.destroyAllWindows()

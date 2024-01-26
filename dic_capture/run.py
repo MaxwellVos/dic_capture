@@ -112,8 +112,8 @@ def run(config: Dict[str, Any]):
 
 
     # Extract the Camera 3 settings from config
-    cam3_source: str = config["Camera 3"]["Camera Source"][:4]
-    cam3_exposure_time_ms: float = config["Camera 3"]["Exposure Time (ms)"]
+    #cam3_source: str = config["Camera 3"]["Camera Source"][:4]
+    #cam3_exposure_time_ms: float = config["Camera 3"]["Exposure Time (ms)"]
 
     # Output directories
     test_id_dir = os.path.join(working_folder, test_id)
@@ -410,10 +410,6 @@ def run(config: Dict[str, Any]):
                         self.zoomed_16 = self.frame[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
                         self.zoomed_8 = (self.zoomed_16 / 256).astype(np.uint8)
                         self.zoomed_heat = cv2.applyColorMap(self.zoomed_8, cv2.COLORMAP_TURBO)
-                        #cv2.rectangle(self.img_rotated, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
-                        #threading.Thread(target=self.showHistogram, args=(), daemon=True).start()
-                        #self.showHistogram()
-
                     self.show_ready = True
                     self.displayWait = True
                     #self.t1 = time()
@@ -427,12 +423,10 @@ def run(config: Dict[str, Any]):
                     self.showHistogram()
                     cv2.imshow(self.zoomWindowName, self.zoomed_heat)
                     cv2.namedWindow(self.windowName)
-                    #cv2.moveWindow(self.windowName, self.xPos, self.yPos)
                     cv2.rectangle(self.img_rotated, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
                     cv2.imshow(self.windowName, self.img_rotated)
                 else:
                     cv2.namedWindow(self.windowName)
-                    #cv2.moveWindow(self.windowName, self.xPos, self.yPos)
                     cv2.imshow(self.windowName, self.img_rotated)
                 self.show_ready = False
 
@@ -453,9 +447,7 @@ def run(config: Dict[str, Any]):
             self.img_hist = cv2.applyColorMap(self.img_hist, cv2.COLORMAP_TURBO)
             self.hist_window_name = str(self.windowName + ' Histogram')
             cv2.namedWindow(self.hist_window_name)
-            #cv2.moveWindow(self.hist_window_name, self.xPosHist, self.yPosHist)
             cv2.imshow(self.hist_window_name, self.img_hist)
-
 
         def getImgID(self):
             return self.imgID
@@ -478,80 +470,7 @@ def run(config: Dict[str, Any]):
         def triggerUpdate(self):
             self.triggerUpdateBool = True
 
-    class VideoShow:  # still have to work out if I still nead the video show class
-        """
-        Class that continuously shows a frame using a dedicated thread.
-        """
 
-        def __init__(self, frame=None):
-            self.frame = frame
-            self.stopped = False
-            self.triggerUpdateShowBool = False
-            self.thread = Thread(target=self.show, args=())
-            self.thread.daemon = True
-            self.thread.start()
-
-        def triggerUpdateShow(self):
-            self.triggerUpdateShowBool = True
-
-        def show(self):
-            # self.windowName = windowName
-            while not self.stopped:
-                try:
-                    VideoShow.getScaledFrame_8(self)
-                    cv2.imshow(self.windowName, self.img_resized_8)
-                    if cv2.waitKey(1) == ord("q"):
-                        self.stopped = True
-                except:
-                    pass
-                    print('Video Show Exception')
-
-        def stop(self):
-            self.stopped = True
-
-        def convert16to8bit(self):
-            self.img_8 = (self.frame / 256).astype('uint8')
-
-        def getScaledFrame_8(self):
-            self.img_8 = (self.frame / 256).astype('uint8')
-            self.img_heat_8 = cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
-            self.width = int((self.img_heat_8.shape[1] * 40) / 100)
-            self.height = int((self.img_heat_8.shape[0] * 40) / 100)
-            self.dim = (self.width, self.height)
-            self.img_resized_8 = cv2.resize(self.img_heat_8, self.dim, interpolation=cv2.INTER_AREA)
-
-    def getScaledFrame_8(img_8, scale_percent):
-        img_8 = cv2.applyColorMap(img_8, cv2.COLORMAP_TURBO)
-        width = int(img_8.shape[1] * scale_percent / 100)
-        height = int(img_8.shape[0] * scale_percent / 100)
-        dim = (width, height)
-        resized = cv2.resize(img_8, dim, interpolation=cv2.INTER_AREA)
-        return resized
-
-    def getHistogram(img_8):
-        histr = cv2.calcHist([img_8], [0], None, [255], [0, 255])
-        histr[254] = histr[254] * 500
-        if histr[254] > 0:
-            histr[254] = int(((max(histr) / 10)))
-        hist_height = 255
-        hist_width = 260
-        img_hist = np.zeros((hist_height + 1, hist_width), dtype=np.uint8)
-        for k in range(0, 255):
-            temp_hist = int((histr[k] / (max(histr))) * hist_height)
-            img_hist[0:temp_hist, k] = k  # black
-        img_hist[0:temp_hist, 255:hist_width] = k
-        img_hist = (img_hist).astype('uint8')
-        img_hist = cv2.applyColorMap(img_hist, cv2.COLORMAP_TURBO)
-
-        for j in range(0, 255):
-            temp_hist = int((histr[j] / (max(histr))) * hist_height)
-            img_hist[temp_hist:hist_height, j] = (255, 255, 255)
-            img_hist[temp_hist, j] = (0, 0, 0)
-
-        img_hist[temp_hist:hist_height, 255:hist_width] = (255, 255, 255)
-        img_hist[temp_hist, 255:hist_width] = (0, 0, 0)
-        img_hist = cv2.flip(img_hist, 0)
-        return img_hist
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
     # (self,src,windowName, timeOut_ms)

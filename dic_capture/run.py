@@ -181,7 +181,7 @@ def run(config: Dict[str, Any]):
             try:  # reads serial output from audrino
                 ser.write(trigger_period_stages_ms.encode())
                 qValue = ser.readline().strip().decode('ascii')
-                print('serial output: ', qValue)
+                #print('serial output: ', qValue)
 
                 if qValue == "RECIEVED":
                     print("Should break here")
@@ -259,36 +259,22 @@ def run(config: Dict[str, Any]):
             self.triggerUpdateBool = False
             self.printFPS = False
             self.img_arr = []
-
             self.thread = Thread(target=self.update, args=())
             self.thread.daemon = True
-
             self.arr_A_full = False
             self.arr_B_full = False
-
-
             self.thread_array_read = Thread(target=self.get_full_arr, args=())
             self.thread_array_read.daemon = True
-
             self.thread_save_array = Thread(target=self.save_array, args=())
             self.thread_save_array.daemon = True
-
             self.img_arr_A = []
             self.img_arr_B = []
-
             self.count_img = 0
-
             self.displayWait = False
-
             self.clicked = 0
-
             self.scale = 0.41
-
             self.save_last_array = False
-
             self.cam_t0 = 0
-
-
 
         def click_event(self, event, x, y, flags, params):
             logging.info('Click event detected.')
@@ -368,7 +354,6 @@ def run(config: Dict[str, Any]):
                     f.write(self.heading_cam)
             while True:
                 try:
-
                     self.img_arr = self.get_full_arr()
                     if self.save_last_array:
                         if self.arr_A_full:
@@ -377,9 +362,12 @@ def run(config: Dict[str, Any]):
                             if self.arr_B_full:
                                 self.img_arr = self.img_arr_A
                             self.save_last_array = False
+
                     if (self.img_arr != 0):
                         self.frame = self.img_arr[0].GetNPArray()
                         self.displayWait = False
+                        threading.Thread(target=self.displayFrame, args=(), daemon=True).start()
+
 
                         if (record_mode == True):
                             for self.k in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
@@ -399,42 +387,24 @@ def run(config: Dict[str, Any]):
                                               'a') as f:
                                         f.write(self.data)
                                     print('saved', self.data)
-
-
                 except:
                     logging.error('Error saving array.')
                     print('save array error')
 
 
         def displayFrame(self):
-
             try:
                 if self.displayWait == False:
                     self.t0 = time()
-                    self.img_8 = (self.frame / 256).astype('uint8')
-                    self.t1 = time()
-                    print('Display frame: ', (self.t1 - self.t0) * 1000)
-
-                    self.img_heat_8 = cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
-                    #self.img_heat_8 = self.img_8#cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
-
-                    # self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
+                    self.heighTest = self.frame.shape[1]
+                    self.widthTest = self.frame.shape[0]
+                    self.img_resized = self.frame[0:self.widthTest:2,0:self.heighTest:2] #uint16
+                    self.img_resized_8 = (self.img_resized / 256).astype(np.uint8)
+                    self.img_heat_8 = cv2.applyColorMap(self.img_resized_8, cv2.COLORMAP_TURBO)
+                    # self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE
                     self.img_rotated = self.img_heat_8
-
-
-
-                    self.width = int(self.img_rotated.shape[1] * self.scale)
-                    self.height = int(self.img_rotated.shape[0] * self.scale)
-                    self.dim = (self.width, self.height)
-
-                    self.img_resized_8 = cv2.resize(self.img_rotated, self.dim, interpolation=cv2.INTER_AREA)
-
-
-
-                    cv2.line(self.img_resized_8, (0, round(self.height / 2)), (self.width, round(self.height / 2)), (0, 255, 0), 1)
-                    cv2.line(self.img_resized_8, (round(self.width / 2), 0), (round(self.width / 2), self.height), (0, 255, 0), 1)
-
+                    self.width = int(self.img_rotated.shape[1])
+                    self.height = int(self.img_rotated.shape[0])
                     if not self.displayWait:
                         if self.clicked > 0:
                             # self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
@@ -445,14 +415,19 @@ def run(config: Dict[str, Any]):
                             cv2.imshow(self.zoomWindowName, self.zoomed_img)
                             self.showHistogram()
 
-                    cv2.namedWindow(self.windowName)
-                    cv2.moveWindow(self.windowName, self.xPos, self.yPos)
-                    cv2.imshow(self.windowName, self.img_resized_8)
-
+                    self.show_ready = True
                     self.displayWait = True
-
+                    self.t1 = time()
+                    print((self.t1 - self.t0) * 1000)
             except:
                 pass
+
+        def showWindow(self):
+            if self.show_ready:
+                cv2.namedWindow(self.windowName)
+                cv2.moveWindow(self.windowName, self.xPos, self.yPos)
+                cv2.imshow(self.windowName, self.img_rotated)
+                self.show_ready = False
 
 
         def showHistogram(self):
@@ -579,8 +554,14 @@ def run(config: Dict[str, Any]):
         cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms)
         # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
         logging.info('Starting camera threads.')
-        cam1.start_vStream()
-        cam2.start_vStream()
+        #cam1.start_vStream()
+        #cam2.start_vStream()
+
+        threading.Thread(target=cam1.start_vStream, args=(), daemon=True).start()
+        threading.Thread(target=cam2.start_vStream, args=(), daemon=True).start()
+
+        #threading.Thread(target=cam1.displayFrame, args=(), daemon=True).start()
+        #threading.Thread(target=cam2.displayFrame, args=(), daemon=True).start()
 
         print('Waiting for cameras to initialize.')
         logging.info('Waiting for cameras to initialize.')
@@ -595,8 +576,11 @@ def run(config: Dict[str, Any]):
     while True:
         try:
             #logging.info('Displaying frames.')
-            cam1.displayFrame()
-            cam2.displayFrame()
+
+            #cam1.displayFrame()
+            #cam2.displayFrame()
+            cam1.showWindow()
+            cam2.showWindow()
 
             cv2.setMouseCallback(cam1.windowName, cam1.click_event)
             cv2.setMouseCallback(cam2.windowName, cam2.click_event)

@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow">
-      <change beforePath="$PROJECT_DIR$/.idea/dic_capture.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dic_capture.iml" afterDir="false" />
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Managed to get the cameras working and close the GUI after clicking the test run button">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/USB test.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -252,7 +250,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706025467212</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Managed to get the cameras working and close the GUI after clicking the test run button">
+      <option name="closed" value="true" />
+      <created>1706253243212</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1706253243212</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -267,6 +273,7 @@
     <MESSAGE value="got the gui and run to talk nicely" />
     <MESSAGE value="made combo boxes auto populate with first item in their list. Not ideal for the cameras but could be improved later" />
     <MESSAGE value="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow" />
-    <option name="LAST_COMMIT_MESSAGE" value="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow" />
+    <MESSAGE value="Managed to get the cameras working and close the GUI after clicking the test run button" />
+    <option name="LAST_COMMIT_MESSAGE" value="Managed to get the cameras working and close the GUI after clicking the test run button" />
   </component>
 </project>

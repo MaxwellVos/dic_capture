@@ -9,13 +9,15 @@ from datetime import datetime
 from tkinter import ttk, filedialog, messagebox
 from typing import Dict, Union
 from ctypes import windll
+import threading
 
 from PIL import Image
 from PIL import ImageTk
 from serial.tools.list_ports import comports
 from ttkthemes import ThemedTk
 
-from dic_capture.run import run
+#from dic_capture.run import run#
+from run import run
 
 import neoapi
 
@@ -24,8 +26,6 @@ import neoapi
 
 DIC_CAPTURE_VERSION = "0.0.3"
 
-global running
-running = True
 
 # =====================================
 # Helper functions for gui. See gui class below.
@@ -87,7 +87,7 @@ class GUI:
                     type="entry", value=250000
                 ),
                 "Image Buffer": dict(
-                    type="entry", value=3
+                    type="entry", value=2
                 ),
                 "Trigger speed per stage (ms)": dict(
                     type="entry", value="200,1000,0,500"
@@ -98,7 +98,7 @@ class GUI:
                     type="combobox", value=get_cameras_port_ID()
                 ),
                 "Exposure Time (ms)": dict(
-                    type="entry", value=1.6
+                    type="entry", value=10
                 ),
 
             },
@@ -107,7 +107,7 @@ class GUI:
                     type="combobox", value=get_cameras_port_ID()
                 ),
                 "Exposure Time (ms)": dict(
-                    type="entry", value=1.6
+                    type="entry", value=10
                 ),
 
             },
@@ -319,11 +319,11 @@ class GUI:
         # update current settings to match current gui settings
         self._update_current_settings()
         self.current_settings["Record Mode"] = True
+        root.destroy()
         run(self.current_settings)
 
 
     def run_test_mode(self):
-        running = False
 
         """Set the config to test mode and run the program."""
 
@@ -335,8 +335,11 @@ class GUI:
         self._update_current_settings()
         self.current_settings["Record Mode"] = False
 
-        run(self.current_settings)
+        #run(self.current_settings)
+        #threading.Thread(target=run, args=(self.current_settings,), daemon=False).start()
         root.destroy()
+        run(self.current_settings)
+        print("starting camera run script")
 
 
     def create_run_frame(self):
@@ -430,14 +433,14 @@ class GUI:
 # =====================================
 # Main program function
 
-def run_gui(running):
+def run_gui():
+
     """Run the program by opening the GUI."""
     global root
     root = ThemedTk(theme="plastik")
     app = GUI(root)
     root.mainloop()
-
-
+    print("Program Ended")
 
 # =====================================
 # Helper function for creating a default config file
@@ -473,8 +476,10 @@ def make_default_dict():
 windll.shcore.SetProcessDpiAwareness(1)
 
 if __name__ == "__main__":
-    run_gui(running)
+    #threading.Thread(target=run_gui, daemon=False).start()
     # make_default_dict()
+    run_gui()
+
 
 # =====================================
 # Todos

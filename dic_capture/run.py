@@ -6,9 +6,10 @@ clicks the "Run" button. The GUI is used to create a config file, which is then 
 
 import logging
 import os
+import threading
 import tkinter.messagebox
 from threading import Thread
-from time import sleep
+from time import sleep, time
 from typing import Dict, Any, List
 
 import cv2
@@ -24,9 +25,34 @@ import tifffile as tf
 # Main Program Loop
 logging_level = logging.INFO
 
-def run(config: Dict[str, Any]):
-    """Run the DIC Capture software with the given config file path and record mode.
 
+def timer_func(func):
+    """
+    This wrapper shows the execution time of the function/method passed.
+    To use:
+    Either pass a function or object method, and it's argument into the
+    timer, or decorate a function with @timer_func() for it to run on
+    all occurrences.
+    https://www.geeksforgeeks.org/timing-functions-with-decorators-python/
+    """
+
+    def wrap_func(*args, **kwargs):
+        # Function imports:
+        # from time import time
+        t0 = time()
+        result = func(*args, **kwargs)
+        t1 = time()
+        print(f'Function {func.__name__!r} executed in {(t1 - t0):.4f}s')
+        return result
+
+    return wrap_func
+
+
+def run(config: Dict[str, Any]):
+
+
+    """Run the DIC Capture software with the given config file path and record mode.
+    
     Example config file:
     {
         "Record Mode": false,
@@ -78,12 +104,12 @@ def run(config: Dict[str, Any]):
 
     # Extract the Camera 1 settings from config
     cam1_src: str = config["Camera 1"]["Camera Source"][:4]
-    print(cam1_src)
     cam1_exposure_time_ms = config["Camera 1"]["Exposure Time (ms)"]
 
     # Extract the Camera 2 settings from config
     cam2_src: str = config["Camera 2"]["Camera Source"][:4]
     cam2_exposure_time_ms = config["Camera 2"]["Exposure Time (ms)"]
+
 
     # Extract the Camera 3 settings from config
     cam3_source: str = config["Camera 3"]["Camera Source"][:4]
@@ -138,30 +164,31 @@ def run(config: Dict[str, Any]):
         pass
 
     # OLD VARIABLE NAMES HERE
-    exposure_time_ms = cam1_exposure_time_ms
+    #exposure_time_ms = cam1_exposure_time_ms
     max_buffer_arr = arduino_max_buffer
 
-    def hardware_trigger(trigger_period_stages_ms):
-        print(trigger_period_stages_ms)
+    def get_period_stages():
+        return trigger_period_stages_ms
+
+    def hardware_trigger():
+        trigger_period_stages_ms_1 = get_period_stages()
         # NOTE: have to wait for everything to initialize, maybe wait before calling the hardware trigger function?
         print('Waiting for serial connection to initialize.')
         logging.info('Waiting for serial connection to initialize.')
-        sleep(1)
+        #sleep(1)
 
         while True:
             try:  # reads serial output from audrino
                 ser.write(trigger_period_stages_ms.encode())
                 qValue = ser.readline().strip().decode('ascii')
                 print('serial output: ', qValue)
-                if qValue == "RECIEVED" and (record_mode == True):
-                    with open(raw_data_save_dir + "/Arduino_Serial_Output_" + test_id + '.txt', 'a') as f:
-                        heading_write_ard = 'Frame' + '\t' + 'Time' + '\t' + 'State' + '\t' + 'Count' + '\t' + 'Last_QTime' + '\n'
-                        f.write(heading_write_ard)  # headings for .txt file output
+
+                if qValue == "RECIEVED":
+                    print("Should break here")
                     break
             except Exception as e:
                 logging.error(f'Error reading serial output from Arduino: {e}')
                 print('serial output error')
-                sleep(0.01)
                 break
 
         while record_mode:
@@ -178,9 +205,23 @@ def run(config: Dict[str, Any]):
                 print('serial output error in second block')
                 break
 
+        while record_mode == False:
+            try:
+                while ser.inWaiting() == 0:
+                    pass
+                qValue = ser.read(ser.in_waiting)
+                #print(qValue)
+
+            except Exception as e:
+                logging.error(f'Error reading serial output from Arduino in second block: {e}')
+                print('serial output error in second block')
+                break
+
+
+
     class vStream():
-        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir):
-            self.buffer_arr_max = buffer_arr_max
+        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir, exposure_time_ms):
+            self.buffer_arr_max = int(buffer_arr_max)
             self.timeOut_ms = timeOut_ms
             self.windowName = windowName
             self.zoomWindowName = windowName + ' Zoomed'
@@ -192,17 +233,21 @@ def run(config: Dict[str, Any]):
             self.xPosHist = xPosHist
             self.yPosHist = yPosHist
             self.cam_save_dir = cam_save_dir
+            self.float_exposure_time = float(exposure_time_ms) * 1000
+
 
             self.camera.SetImageBufferCount(20)
             self.camera.SetImageBufferCycleCount(10)
 
             self.camera.f.PixelFormat.SetString('Mono12')
-            self.camera.f.ExposureTime.Set(exposure_time_ms * 1000)
+
+            self.camera.f.ExposureTime.Set(self.float_exposure_time)
+            self.camera.f.Gain.Set(1)
+
             self.camera.f.TriggerMode = neoapi.TriggerMode_On
-            # self.camera.f.TriggerSource = neoapi.TriggerSource_Software
-            # self.camera.f.TriggerSoftware.Execute()
             self.camera.f.TriggerSource = neoapi.TriggerSource_Line2
-            self.camera.f.TriggerActivation = neoapi.TriggerActivation_RisingEdge
+            self.camera.f.TriggerActivation = neoapi.TriggerActivation_FallingEdge
+
             # self.camera.f.TriggerActivation neoapi.AcquisitionStatusSelector_AcquisitionTriggerWait
             # self.cam_event = neoapi.NeoEvent()
             # self.camera.ClearEvents()
@@ -220,6 +265,7 @@ def run(config: Dict[str, Any]):
 
             self.arr_A_full = False
             self.arr_B_full = False
+
 
             self.thread_array_read = Thread(target=self.get_full_arr, args=())
             self.thread_array_read.daemon = True
@@ -242,6 +288,8 @@ def run(config: Dict[str, Any]):
 
             self.cam_t0 = 0
 
+
+
         def click_event(self, event, x, y, flags, params):
             logging.info('Click event detected.')
 
@@ -262,11 +310,13 @@ def run(config: Dict[str, Any]):
                 self.clicked = self.clicked + 1
 
         def start_vStream(self):
+
             logging.info('Starting camera thread.')
 
             self.thread.start()
             self.thread_array_read.start()
             self.thread_save_array.start()
+
 
         def update(self):
             self.temp = []
@@ -274,6 +324,7 @@ def run(config: Dict[str, Any]):
                 self.img_arr_A.append(self.temp)
                 self.img_arr_B.append(self.temp)
             while True:
+
                 for self.i in range(0, self.buffer_arr_max):
                     try:
                         self.img = self.camera.GetImage(self.timeOut_ms)
@@ -283,6 +334,7 @@ def run(config: Dict[str, Any]):
                         print('Image grab problem print problem')
                 self.arr_A_full = True
                 self.arr_B_full = False
+
                 for self.i in range(0, self.buffer_arr_max):
                     try:
                         self.img = self.camera.GetImage(self.timeOut_ms)
@@ -297,6 +349,7 @@ def run(config: Dict[str, Any]):
             self.save_last_array = True
 
         def get_full_arr(self):
+
             while True:
                 if self.arr_A_full:
                     self.arr_A_full = False
@@ -315,6 +368,7 @@ def run(config: Dict[str, Any]):
                     f.write(self.heading_cam)
             while True:
                 try:
+
                     self.img_arr = self.get_full_arr()
                     if self.save_last_array:
                         if self.arr_A_full:
@@ -328,16 +382,12 @@ def run(config: Dict[str, Any]):
                         self.displayWait = False
 
                         if (record_mode == True):
-                            for self.k in range(0,
-                                                self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
-
-                                self.img_title = str(test_id) + '_' + str(
-                                    self.img_arr[self.k].GetImageID()) + '_' + self.windowName + '.tif'
+                            for self.k in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
+                                self.img_title = str(test_id) + '_' + str(self.img_arr[self.k].GetImageID()) + '_' + self.windowName + '.tif'
                                 self.fileName = self.cam_save_dir + '/' + self.img_title
                                 self.save_img = self.img_arr[self.k].GetNPArray()
                                 self.img_ID = self.img_arr[self.k].GetImageID()
                                 self.img_TimeStamp = self.img_arr[self.k].GetTimestamp()
-
                                 if self.img_TimeStamp != 0:
                                     if (self.img_ID == 0):
                                         self.cam_t0 = self.img_TimeStamp
@@ -355,44 +405,55 @@ def run(config: Dict[str, Any]):
                     logging.error('Error saving array.')
                     print('save array error')
 
+
         def displayFrame(self):
-            if self.displayWait == False:
 
-                self.img_8 = (self.frame / 256).astype('uint8')
-                self.img_heat_8 = cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
-                # self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                self.img_rotated = self.img_heat_8
+            try:
+                if self.displayWait == False:
+                    self.t0 = time()
+                    self.img_8 = (self.frame / 256).astype('uint8')
+                    self.t1 = time()
+                    print('Display frame: ', (self.t1 - self.t0) * 1000)
 
-                self.width = int(self.img_rotated.shape[1] * self.scale)
-                self.height = int(self.img_rotated.shape[0] * self.scale)
-                self.dim = (self.width, self.height)
+                    self.img_heat_8 = cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
+                    #self.img_heat_8 = self.img_8#cv2.applyColorMap(self.img_8, cv2.COLORMAP_TURBO)
 
-                self.img_resized_8 = cv2.resize(self.img_rotated, self.dim, interpolation=cv2.INTER_AREA)
+                    # self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-                cv2.line(self.img_resized_8, (0, round(self.height / 2)), (self.width, round(self.height / 2)),
-                         (0, 255, 0),
-                         1)
-                cv2.line(self.img_resized_8, (round(self.width / 2), 0), (round(self.width / 2), self.height),
-                         (0, 255, 0),
-                         1)
+                    self.img_rotated = self.img_heat_8
 
-                if not self.displayWait:
-                    if self.clicked > 0:
-                        # self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                        self.img_grey_rotated = self.img_8
-                        cv2.rectangle(self.img_resized_8, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
-                        self.zoomed_img = self.img_rotated[self.y_0_scaled: self.y_1_scaled,
-                                          self.x_0_scaled: self.x_1_scaled]
-                        self.zoomed_gray = self.img_grey_rotated[self.y_0_scaled: self.y_1_scaled,
-                                           self.x_0_scaled: self.x_1_scaled]
-                        cv2.imshow(self.zoomWindowName, self.zoomed_img)
-                        self.showHistogram()
 
-                cv2.namedWindow(self.windowName)
-                cv2.moveWindow(self.windowName, self.xPos, self.yPos)
-                cv2.imshow(self.windowName, self.img_resized_8)
 
-                self.displayWait = True
+                    self.width = int(self.img_rotated.shape[1] * self.scale)
+                    self.height = int(self.img_rotated.shape[0] * self.scale)
+                    self.dim = (self.width, self.height)
+
+                    self.img_resized_8 = cv2.resize(self.img_rotated, self.dim, interpolation=cv2.INTER_AREA)
+
+
+
+                    cv2.line(self.img_resized_8, (0, round(self.height / 2)), (self.width, round(self.height / 2)), (0, 255, 0), 1)
+                    cv2.line(self.img_resized_8, (round(self.width / 2), 0), (round(self.width / 2), self.height), (0, 255, 0), 1)
+
+                    if not self.displayWait:
+                        if self.clicked > 0:
+                            # self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                            self.img_grey_rotated = self.img_8
+                            cv2.rectangle(self.img_resized_8, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
+                            self.zoomed_img = self.img_rotated[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
+                            self.zoomed_gray = self.img_grey_rotated[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
+                            cv2.imshow(self.zoomWindowName, self.zoomed_img)
+                            self.showHistogram()
+
+                    cv2.namedWindow(self.windowName)
+                    cv2.moveWindow(self.windowName, self.xPos, self.yPos)
+                    cv2.imshow(self.windowName, self.img_resized_8)
+
+                    self.displayWait = True
+
+            except:
+                pass
+
 
         def showHistogram(self):
             self.histr = cv2.calcHist([self.zoomed_gray], [0], None, [255], [0, 255])
@@ -509,29 +570,21 @@ def run(config: Dict[str, Any]):
         img_hist[temp_hist, 255:hist_width] = (0, 0, 0)
         img_hist = cv2.flip(img_hist, 0)
         return img_hist
-
     logging.info('Starting hardware trigger thread.')
-
-    threadTrigger = Thread(target=hardware_trigger(trigger_period_stages_ms), args=())
-    threadTrigger.daemon = True
-    threadTrigger.start()
-
+    threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
     # (self,src,windowName, timeOut_ms)
     try:
         logging.info('Creating camera objects.')
-
-        cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir)
-        cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir)
+        cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms)
+        cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms)
         # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
-
         logging.info('Starting camera threads.')
-
         cam1.start_vStream()
         cam2.start_vStream()
 
         print('Waiting for cameras to initialize.')
         logging.info('Waiting for cameras to initialize.')
-        sleep(2)
+        #sleep(2)
 
     except Exception as e:
         logging.error(f'Error creating camera objects: {e}')
@@ -540,10 +593,8 @@ def run(config: Dict[str, Any]):
 
     error_count = 0
     while True:
-
         try:
-            logging.info('Displaying frames.')
-
+            #logging.info('Displaying frames.')
             cam1.displayFrame()
             cam2.displayFrame()
 
@@ -557,7 +608,7 @@ def run(config: Dict[str, Any]):
             logging.info('Exiting program.')
 
             # cam1.capture.release()
-            cam1.save_buffer_remainder()
+            #cam1.save_buffer_remainder()
             cv2.destroyAllWindows()
             exit(1)
             break

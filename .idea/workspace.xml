@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
-    </list>
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -266,7 +262,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706273153947</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time">
+      <option name="closed" value="true" />
+      <created>1706277396198</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1706277396198</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -283,6 +287,7 @@
     <MESSAGE value="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow" />
     <MESSAGE value="Managed to get the cameras working and close the GUI after clicking the test run button" />
     <MESSAGE value="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter" />
-    <option name="LAST_COMMIT_MESSAGE" value="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter" />
+    <MESSAGE value="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time" />
   </component>
 </project>

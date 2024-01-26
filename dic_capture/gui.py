@@ -111,15 +111,15 @@ class GUI:
                 ),
 
             },
-            "Camera 3": {
-                "Camera Source": dict(
-                    type="combobox", value=get_cameras_port_ID()
-                ),
-                "Exposure Time (ms)": dict(
-                    type="entry", value=""
-                ),
+            #"Camera 3": {
+            #    "Camera Source": dict(
+            #        type="combobox", value=get_cameras_port_ID()
+            #    ),
+            #    "Exposure Time (ms)": dict(
+            #        type="entry", value=""
+            #    ),
 
-            },
+            #},
         }
 
         # Create the main window
@@ -386,9 +386,9 @@ class GUI:
         camera_config_frame_2.grid(row=2, column=1, sticky='nsew', padx=10, pady=10)
         self._add_controls(parent=camera_config_frame_2, control_dict=self.config_widgets["Camera 2"])
 
-        camera_config_frame_3 = ttk.LabelFrame(frame, text="Camera 3", borderwidth=4)
-        camera_config_frame_3.grid(row=2, column=2, sticky='nsew', padx=10, pady=10)
-        self._add_controls(parent=camera_config_frame_3, control_dict=self.config_widgets["Camera 3"])
+        #camera_config_frame_3 = ttk.LabelFrame(frame, text="Camera 3", borderwidth=4)
+        #camera_config_frame_3.grid(row=2, column=2, sticky='nsew', padx=10, pady=10)
+        #self._add_controls(parent=camera_config_frame_3, control_dict=self.config_widgets["Camera 3"])
 
     @staticmethod
     def load_config_from_file(config_file_path: str):

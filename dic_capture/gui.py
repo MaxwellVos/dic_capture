@@ -327,9 +327,9 @@ class GUI:
 
         """Set the config to test mode and run the program."""
 
-        if not self.working_folder:
-            messagebox.showerror("Error", "Please select a working folder before running the program.")
-            return
+        #if not self.working_folder:
+        #    messagebox.showerror("Error", "Please select a working folder before running the program.")
+        #    return
 
         # update current settings to match current gui settings
         self._update_current_settings()

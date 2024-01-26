@@ -272,7 +272,7 @@ def run(config: Dict[str, Any]):
             self.count_img = 0
             self.displayWait = False
             self.clicked = 0
-            self.scale = 0.41
+            self.scale = 0.5
             self.save_last_array = False
             self.cam_t0 = 0
 
@@ -395,7 +395,7 @@ def run(config: Dict[str, Any]):
         def displayFrame(self):
             try:
                 if self.displayWait == False:
-                    self.t0 = time()
+                    #self.t0 = time()
                     self.heighTest = self.frame.shape[1]
                     self.widthTest = self.frame.shape[0]
                     self.img_resized = self.frame[0:self.widthTest:2,0:self.heighTest:2] #uint16
@@ -405,33 +405,39 @@ def run(config: Dict[str, Any]):
                     self.img_rotated = self.img_heat_8
                     self.width = int(self.img_rotated.shape[1])
                     self.height = int(self.img_rotated.shape[0])
-                    if not self.displayWait:
-                        if self.clicked > 0:
-                            # self.img_grey_rotated = cv2.rotate(self.img_8, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                            self.img_grey_rotated = self.img_8
-                            cv2.rectangle(self.img_resized_8, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
-                            self.zoomed_img = self.img_rotated[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
-                            self.zoomed_gray = self.img_grey_rotated[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
-                            cv2.imshow(self.zoomWindowName, self.zoomed_img)
-                            self.showHistogram()
+
+                    if self.clicked > 0:
+                        self.zoomed_16 = self.frame[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
+                        self.zoomed_8 = (self.zoomed_16 / 256).astype(np.uint8)
+                        self.zoomed_heat = cv2.applyColorMap(self.zoomed_8, cv2.COLORMAP_TURBO)
+                        #cv2.rectangle(self.img_rotated, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
+                        #threading.Thread(target=self.showHistogram, args=(), daemon=True).start()
+                        #self.showHistogram()
 
                     self.show_ready = True
                     self.displayWait = True
-                    self.t1 = time()
-                    print((self.t1 - self.t0) * 1000)
+                    #self.t1 = time()
+                    #print((self.t1 - self.t0) * 1000)
             except:
                 pass
 
         def showWindow(self):
             if self.show_ready:
-                cv2.namedWindow(self.windowName)
-                cv2.moveWindow(self.windowName, self.xPos, self.yPos)
-                cv2.imshow(self.windowName, self.img_rotated)
+                if self.clicked > 0:
+                    self.showHistogram()
+                    cv2.imshow(self.zoomWindowName, self.zoomed_heat)
+                    cv2.namedWindow(self.windowName)
+                    #cv2.moveWindow(self.windowName, self.xPos, self.yPos)
+                    cv2.rectangle(self.img_rotated, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
+                    cv2.imshow(self.windowName, self.img_rotated)
+                else:
+                    cv2.namedWindow(self.windowName)
+                    #cv2.moveWindow(self.windowName, self.xPos, self.yPos)
+                    cv2.imshow(self.windowName, self.img_rotated)
                 self.show_ready = False
 
-
         def showHistogram(self):
-            self.histr = cv2.calcHist([self.zoomed_gray], [0], None, [255], [0, 255])
+            self.histr = cv2.calcHist([self.zoomed_8], [0], None, [255], [0, 255])
             self.histr[254] = self.histr[254] * 10000
             if self.histr[254] > 0:
                 self.histr[254] = int(((max(self.histr) / 10)))
@@ -446,9 +452,10 @@ def run(config: Dict[str, Any]):
             self.img_hist = (self.img_hist).astype('uint8')
             self.img_hist = cv2.applyColorMap(self.img_hist, cv2.COLORMAP_TURBO)
             self.hist_window_name = str(self.windowName + ' Histogram')
-            cv2.namedWindow(self.hist_window_name)  # Create a named window
-            cv2.moveWindow(self.hist_window_name, self.xPosHist, self.yPosHist)
+            cv2.namedWindow(self.hist_window_name)
+            #cv2.moveWindow(self.hist_window_name, self.xPosHist, self.yPosHist)
             cv2.imshow(self.hist_window_name, self.img_hist)
+
 
         def getImgID(self):
             return self.imgID
@@ -554,14 +561,8 @@ def run(config: Dict[str, Any]):
         cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms)
         # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
         logging.info('Starting camera threads.')
-        #cam1.start_vStream()
-        #cam2.start_vStream()
-
-        threading.Thread(target=cam1.start_vStream, args=(), daemon=True).start()
-        threading.Thread(target=cam2.start_vStream, args=(), daemon=True).start()
-
-        #threading.Thread(target=cam1.displayFrame, args=(), daemon=True).start()
-        #threading.Thread(target=cam2.displayFrame, args=(), daemon=True).start()
+        cam1.start_vStream()
+        cam2.start_vStream()
 
         print('Waiting for cameras to initialize.')
         logging.info('Waiting for cameras to initialize.')

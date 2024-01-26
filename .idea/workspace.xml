@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Managed to get the cameras working and close the GUI after clicking the test run button">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
@@ -258,7 +258,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706253243212</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter">
+      <option name="closed" value="true" />
+      <created>1706273153947</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1706273153947</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -274,6 +282,7 @@
     <MESSAGE value="made combo boxes auto populate with first item in their list. Not ideal for the cameras but could be improved later" />
     <MESSAGE value="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow" />
     <MESSAGE value="Managed to get the cameras working and close the GUI after clicking the test run button" />
-    <option name="LAST_COMMIT_MESSAGE" value="Managed to get the cameras working and close the GUI after clicking the test run button" />
+    <MESSAGE value="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter" />
+    <option name="LAST_COMMIT_MESSAGE" value="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter" />
   </component>
 </project>

@@ -234,29 +234,21 @@ def run(config: Dict[str, Any]):
             self.yPosHist = yPosHist
             self.cam_save_dir = cam_save_dir
             self.float_exposure_time = float(exposure_time_ms) * 1000
-
-
             self.camera.SetImageBufferCount(20)
             self.camera.SetImageBufferCycleCount(10)
-
             self.camera.f.PixelFormat.SetString('Mono12')
-
             self.camera.f.ExposureTime.Set(self.float_exposure_time)
             self.camera.f.Gain.Set(1)
-
             self.camera.f.TriggerMode = neoapi.TriggerMode_On
             self.camera.f.TriggerSource = neoapi.TriggerSource_Line2
             self.camera.f.TriggerActivation = neoapi.TriggerActivation_FallingEdge
-
             # self.camera.f.TriggerActivation neoapi.AcquisitionStatusSelector_AcquisitionTriggerWait
             # self.cam_event = neoapi.NeoEvent()
             # self.camera.ClearEvents()
             # self.camera.EnableEvent("ExposureStart")
-
             # self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
             # self.camera.EnableChunk('ExposureTime')
             # self.camera.EnableEvent("ExposureStart")
-            self.printFPS = False
             self.img_arr = []
             self.thread = Thread(target=self.update, args=())
             self.thread.daemon = True
@@ -277,7 +269,6 @@ def run(config: Dict[str, Any]):
 
         def click_event(self, event, x, y, flags, params):
             logging.info('Click event detected.')
-
             self.event = event
             self.flags = flags
             self.params = params
@@ -295,13 +286,10 @@ def run(config: Dict[str, Any]):
                 self.clicked = self.clicked + 1
 
         def start_vStream(self):
-
             logging.info('Starting camera thread.')
-
             self.thread.start()
             self.thread_array_read.start()
             self.thread_save_array.start()
-
 
         def update(self):
             self.temp = []
@@ -309,7 +297,6 @@ def run(config: Dict[str, Any]):
                 self.img_arr_A.append(self.temp)
                 self.img_arr_B.append(self.temp)
             while True:
-
                 for self.i in range(0, self.buffer_arr_max):
                     try:
                         self.img = self.camera.GetImage(self.timeOut_ms)
@@ -319,7 +306,6 @@ def run(config: Dict[str, Any]):
                         print('Image grab problem print problem')
                 self.arr_A_full = True
                 self.arr_B_full = False
-
                 for self.i in range(0, self.buffer_arr_max):
                     try:
                         self.img = self.camera.GetImage(self.timeOut_ms)
@@ -360,12 +346,10 @@ def run(config: Dict[str, Any]):
                             if self.arr_B_full:
                                 self.img_arr = self.img_arr_A
                             self.save_last_array = False
-
                     if (self.img_arr != 0):
                         self.frame = self.img_arr[0].GetNPArray()
                         self.displayWait = False
                         threading.Thread(target=self.displayFrame, args=(), daemon=True).start()
-
 
                         if (record_mode == True):
                             for self.k in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
@@ -399,11 +383,10 @@ def run(config: Dict[str, Any]):
                     self.img_resized = self.frame[0:self.widthTest:2,0:self.heighTest:2] #uint16
                     self.img_resized_8 = (self.img_resized / 256).astype(np.uint8)
                     self.img_heat_8 = cv2.applyColorMap(self.img_resized_8, cv2.COLORMAP_TURBO)
-                    # self.img_rotated = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE
+                    # self.img_heat_8 = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE #use to rotate image if needed
                     self.img_rotated = self.img_heat_8
                     self.width = int(self.img_rotated.shape[1])
                     self.height = int(self.img_rotated.shape[0])
-
                     if self.clicked > 0:
                         self.zoomed_16 = self.frame[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
                         self.zoomed_8 = (self.zoomed_16 / 256).astype(np.uint8)
@@ -452,7 +435,7 @@ def run(config: Dict[str, Any]):
 
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
-    # (self,src,windowName, timeOut_ms)
+
     try:
         logging.info('Creating camera objects.')
         cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms)
@@ -475,23 +458,18 @@ def run(config: Dict[str, Any]):
     while True:
         try:
             #logging.info('Displaying frames.')
-
-            #cam1.displayFrame()
-            #cam2.displayFrame()
             cam1.showWindow()
             cam2.showWindow()
-
             cv2.setMouseCallback(cam1.windowName, cam1.click_event)
             cv2.setMouseCallback(cam2.windowName, cam2.click_event)
-
         except Exception as e:
             pass
 
-        if cv2.waitKey(10) == "TEMPORTY BLOCK":  # ord('q'):
+        if cv2.waitKey(10) == "TEMPORTY BLOCK":  # ord('q'): #work out a safe command for stopping the program
             logging.info('Exiting program.')
-
             # cam1.capture.release()
-            #cam1.save_buffer_remainder()
+            cam1.save_buffer_remainder()
+            cam2.save_buffer_remainder()
             cv2.destroyAllWindows()
             exit(1)
             break

@@ -256,7 +256,6 @@ def run(config: Dict[str, Any]):
             # self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
             # self.camera.EnableChunk('ExposureTime')
             # self.camera.EnableEvent("ExposureStart")
-            self.triggerUpdateBool = False
             self.printFPS = False
             self.img_arr = []
             self.thread = Thread(target=self.update, args=())
@@ -335,7 +334,6 @@ def run(config: Dict[str, Any]):
             self.save_last_array = True
 
         def get_full_arr(self):
-
             while True:
                 if self.arr_A_full:
                     self.arr_A_full = False
@@ -448,27 +446,8 @@ def run(config: Dict[str, Any]):
             self.hist_window_name = str(self.windowName + ' Histogram')
             cv2.namedWindow(self.hist_window_name)
             cv2.imshow(self.hist_window_name, self.img_hist)
-
-        def getImgID(self):
-            return self.imgID
-
-        def getFPS(self):
-            return 10
-
         def getTimestamp(self):
             return self.timestamp_arr[1]
-
-        def getFrame(self):
-            return self.img_16
-
-        def returnCaptured(self):
-            return self.captured
-
-        def getFrameTimestamp(self):
-            return self.img_timestamp
-
-        def triggerUpdate(self):
-            self.triggerUpdateBool = True
 
 
     logging.info('Starting hardware trigger thread.')

@@ -90,7 +90,7 @@ class GUI:
                     type="entry", value=2
                 ),
                 "Trigger speed per stage (ms)": dict(
-                    type="entry", value="50,1000,0,500"
+                    type="entry", value="30,1000,0,500"
                 ),
             },
             "Camera 1": {

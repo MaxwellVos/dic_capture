@@ -267,6 +267,12 @@ def run(config: Dict[str, Any]):
             self.save_last_array = False
             self.cam_t0 = 0
 
+        def inc_exposure_ms(self,inc_ms):
+            self.inc_ms = inc_ms
+            self.float_exposure_time = self.float_exposure_time + inc_ms*1000
+            self.camera.f.ExposureTime.Set(self.float_exposure_time)
+            print("Cam"+self.windowName+' changed exposure time to: ', str(self.float_exposure_time/1000)+'ms')
+
         def click_event(self, event, x, y, flags, params):
             logging.info('Click event detected.')
             self.event = event
@@ -432,7 +438,6 @@ def run(config: Dict[str, Any]):
         def getTimestamp(self):
             return self.timestamp_arr[1]
 
-
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
 
@@ -462,10 +467,23 @@ def run(config: Dict[str, Any]):
             cam2.showWindow()
             cv2.setMouseCallback(cam1.windowName, cam1.click_event)
             cv2.setMouseCallback(cam2.windowName, cam2.click_event)
+
+            key = cv2.waitKeyEx(2)
+
+            exposure_inc = 1
+            if key == 2555904: #RIGHT arrow key for cam 1
+                cam1.inc_exposure_ms(exposure_inc)
+            elif key == 2424832: #LEFT arrow key for cam 1
+                cam1.inc_exposure_ms(-exposure_inc)
+            elif key == 2490368: #UP arrow key for cam 2
+                cam2.inc_exposure_ms(exposure_inc)
+            elif key == 2621440: #DOWN arrow key for cam 2
+                cam2.inc_exposure_ms(-exposure_inc)
+
         except Exception as e:
             pass
 
-        if cv2.waitKey(10) == "TEMPORTY BLOCK":  # ord('q'): #work out a safe command for stopping the program
+        if cv2.waitKey(1) == "TEMPORTY BLOCK":  # ord('q'): #work out a safe command for stopping the program
             logging.info('Exiting program.')
             # cam1.capture.release()
             cam1.save_buffer_remainder()

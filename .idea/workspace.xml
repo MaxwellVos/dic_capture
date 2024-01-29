@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="got rid of the video show class that isnt necissary">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="formatting stuff">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -296,7 +297,23 @@
       <option name="project" value="LOCAL" />
       <updated>1706278619533</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Got rid of some legacy methods that werent being used anymore. Still to do: add button for cameraless operation.">
+      <option name="closed" value="true" />
+      <created>1706278920118</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1706278920118</updated>
+    </task>
+    <task id="LOCAL-00019" summary="formatting stuff">
+      <option name="closed" value="true" />
+      <created>1706279239320</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1706279239320</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -327,6 +344,8 @@
     <MESSAGE value="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time" />
     <MESSAGE value="Removed camera 3 from GUI for now. Will re-visit adding more camera capabilities but outside the scope of this project. For now, cameras can be connected to other cameras and triggered by the arduino (like is done with the thermal camera)" />
     <MESSAGE value="got rid of the video show class that isnt necissary" />
-    <option name="LAST_COMMIT_MESSAGE" value="got rid of the video show class that isnt necissary" />
+    <MESSAGE value="Got rid of some legacy methods that werent being used anymore. Still to do: add button for cameraless operation." />
+    <MESSAGE value="formatting stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="formatting stuff" />
   </component>
 </project>

@@ -246,8 +246,8 @@ class GUI:
 
     def _update_config_frame(self, event, select_config_combobox, config_widgets):
         """Update the settings in the Config frame based on the selected config file, except for the working folder."""
-        if not messagebox.askokcancel("Warning", "Existing settings selections will be overridden. Continue?"):
-            return
+        #if not messagebox.askokcancel("Warning", "Existing settings selections will be overridden. Continue?"):
+        #    return
 
         # Get the dict of settings based on the selected name
         config = self.configs[select_config_combobox.get()]

@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="formatting stuff">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Added funtion to change exposure time live using arrow keys">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2024_01_23_12_18__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2024_01_23_12_18__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -346,6 +347,7 @@
     <MESSAGE value="got rid of the video show class that isnt necissary" />
     <MESSAGE value="Got rid of some legacy methods that werent being used anymore. Still to do: add button for cameraless operation." />
     <MESSAGE value="formatting stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="formatting stuff" />
+    <MESSAGE value="Added funtion to change exposure time live using arrow keys" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added funtion to change exposure time live using arrow keys" />
   </component>
 </project>

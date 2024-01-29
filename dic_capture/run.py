@@ -181,7 +181,7 @@ def run(config: Dict[str, Any]):
             try:  # reads serial output from audrino
                 ser.write(trigger_period_stages_ms.encode())
                 qValue = ser.readline().strip().decode('ascii')
-                #print('serial output: ', qValue)
+                print('serial output: ', qValue)
 
                 if qValue == "RECIEVED":
                     print("Should break here")
@@ -210,7 +210,7 @@ def run(config: Dict[str, Any]):
                 while ser.inWaiting() == 0:
                     pass
                 qValue = ser.read(ser.in_waiting)
-                #print(qValue)
+                print(qValue)
 
             except Exception as e:
                 logging.error(f'Error reading serial output from Arduino in second block: {e}')
@@ -250,8 +250,8 @@ def run(config: Dict[str, Any]):
             # self.camera.EnableChunk('ExposureTime')
             # self.camera.EnableEvent("ExposureStart")
             self.img_arr = []
-            self.thread = Thread(target=self.update, args=())
-            self.thread.daemon = True
+            self.thread_update = Thread(target=self.update, args=())
+            self.thread_update.daemon = True
             self.arr_A_full = False
             self.arr_B_full = False
             self.thread_array_read = Thread(target=self.get_full_arr, args=())
@@ -293,7 +293,7 @@ def run(config: Dict[str, Any]):
 
         def start_vStream(self):
             logging.info('Starting camera thread.')
-            self.thread.start()
+            self.thread_update.start()
             self.thread_array_read.start()
             self.thread_save_array.start()
 
@@ -326,16 +326,16 @@ def run(config: Dict[str, Any]):
             self.save_last_array = True
 
         def get_full_arr(self):
-            while True:
-                if self.arr_A_full:
-                    self.arr_A_full = False
-                    return self.img_arr_A
+            #while True:
+            if self.arr_A_full:
+                self.arr_A_full = False
+                return self.img_arr_A
+            else:
+                if self.arr_B_full:
+                    self.arr_B_full = False
+                    return self.img_arr_B
                 else:
-                    if self.arr_B_full:
-                        self.arr_B_full = False
-                        return self.img_arr_B
-                    else:
-                        return 0
+                    return 0
 
         def save_array(self):
             if (record_mode == True):
@@ -352,10 +352,12 @@ def run(config: Dict[str, Any]):
                             if self.arr_B_full:
                                 self.img_arr = self.img_arr_A
                             self.save_last_array = False
+
+
                     if (self.img_arr != 0):
                         self.frame = self.img_arr[0].GetNPArray()
                         self.displayWait = False
-                        threading.Thread(target=self.displayFrame, args=(), daemon=True).start()
+                        #threading.Thread(target=self.displayFrame, args=(), daemon=True).start()
 
                         if (record_mode == True):
                             for self.k in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
@@ -465,20 +467,20 @@ def run(config: Dict[str, Any]):
             #logging.info('Displaying frames.')
             cam1.showWindow()
             cam2.showWindow()
-            cv2.setMouseCallback(cam1.windowName, cam1.click_event)
-            cv2.setMouseCallback(cam2.windowName, cam2.click_event)
 
-            key = cv2.waitKeyEx(2)
-
-            exposure_inc = 1
-            if key == 2555904: #RIGHT arrow key for cam 1
-                cam1.inc_exposure_ms(exposure_inc)
-            elif key == 2424832: #LEFT arrow key for cam 1
-                cam1.inc_exposure_ms(-exposure_inc)
-            elif key == 2490368: #UP arrow key for cam 2
-                cam2.inc_exposure_ms(exposure_inc)
-            elif key == 2621440: #DOWN arrow key for cam 2
-                cam2.inc_exposure_ms(-exposure_inc)
+            if record_mode == False:
+                cv2.setMouseCallback(cam1.windowName, cam1.click_event)
+                cv2.setMouseCallback(cam2.windowName, cam2.click_event)
+                key = cv2.waitKeyEx(2)
+                exposure_inc = 1
+                if key == 2555904: #RIGHT arrow key for cam 1
+                    cam1.inc_exposure_ms(exposure_inc)
+                elif key == 2424832: #LEFT arrow key for cam 1
+                    cam1.inc_exposure_ms(-exposure_inc)
+                elif key == 2490368: #UP arrow key for cam 2
+                    cam2.inc_exposure_ms(exposure_inc)
+                elif key == 2621440: #DOWN arrow key for cam 2
+                    cam2.inc_exposure_ms(-exposure_inc)
 
         except Exception as e:
             pass
@@ -488,6 +490,7 @@ def run(config: Dict[str, Any]):
             # cam1.capture.release()
             cam1.save_buffer_remainder()
             cam2.save_buffer_remainder()
+            print()
             cv2.destroyAllWindows()
             exit(1)
             break

@@ -233,6 +233,7 @@ def run(config: Dict[str, Any]):
             self.xPosHist = xPosHist
             self.yPosHist = yPosHist
             self.k_super = 0
+            self.super_img_arr_len = 50
             self.cam_save_dir = cam_save_dir
             self.float_exposure_time = float(exposure_time_ms) * 1000
             self.camera.SetImageBufferCount(20)
@@ -265,7 +266,7 @@ def run(config: Dict[str, Any]):
             self.img_arr_A = []
             self.img_arr_B = []
             self.super_img_arr = []
-            self.super_img_arr_len = 50
+
             self.count_img = 0
             self.displayWait = False
             self.clicked = 0
@@ -348,10 +349,8 @@ def run(config: Dict[str, Any]):
 
         def save_array(self):
             if (record_mode == True):
-                print('test1')
                 for self.j in range(0,self.super_img_arr_len):
                     self.super_img_arr.append([])
-                    print('test2')
                     #np.append(self.super_img_arr,self.temp)
                 self.k_super = 0
                 with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt', 'a') as f:
@@ -376,12 +375,11 @@ def run(config: Dict[str, Any]):
 
                         if (record_mode == True):
                             #self.super_img_arr.append(self.img_arr)
-                            print(self.img_arr)
                             self.super_img_arr[self.k_super] = self.img_arr
-                            print(self.super_img_arr[self.k_super])
                             self.k_super = self.k_super + 1
-                            print('k-super:,',self.k_super)
-                            print('whole array:',self.super_img_arr)
+                            if self.k_super == self.super_img_arr_len:
+                                self.k_super = 0
+
 
                 except:
                     logging.error('Error saving array.')
@@ -393,13 +391,11 @@ def run(config: Dict[str, Any]):
             while True:
                 #print('While true', self.k_super)
                 if self.n < self.k_super:
-                    print('trying something')
                     self.save_arr = self.super_img_arr[self.n]
-                    print('save array:',self.save_arr)
                     for self.m in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
+                        self.t0 = time()
                         self.img_title = str(test_id) + '_' + str(
                             self.save_arr[self.m].GetImageID()) + '_' + self.windowName + '.tif'
-                        print(self.img_title)
                         self.fileName = self.cam_save_dir + '/' + self.img_title
                         self.save_img = self.save_arr[self.m].GetNPArray()
                         self.img_ID = self.save_arr[self.m].GetImageID()
@@ -410,11 +406,17 @@ def run(config: Dict[str, Any]):
                             self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
                             self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
                                 self.img_TimeStamp_zerod) + '\n'
+                            self.t0 = time()
                             tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
                             with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
                                       'a') as f:
                                 f.write(self.data)
                             print('saved', self.data)
+                            self.t1 = time()
+                            print('Time:', (self.t1 - self.t0) * 1000)
+                    self.n = self.n + 1
+                    if self.n == self.super_img_arr_len:
+                        self.n = 0
                 else:
                     pass
 

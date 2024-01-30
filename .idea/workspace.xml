@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="couldnt get the saving consistent with mutlithreading. Going to Try saving everything and reading from one big array">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Got the saving working well, going to add the second camera now">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -345,7 +345,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706610584108</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Got the saving working well, going to add the second camera now">
+      <option name="closed" value="true" />
+      <created>1706621967994</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1706621967994</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -382,6 +390,7 @@
     <MESSAGE value="kind of getting the super save array to work. lots more to do" />
     <MESSAGE value="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out." />
     <MESSAGE value="couldnt get the saving consistent with mutlithreading. Going to Try saving everything and reading from one big array" />
-    <option name="LAST_COMMIT_MESSAGE" value="couldnt get the saving consistent with mutlithreading. Going to Try saving everything and reading from one big array" />
+    <MESSAGE value="Got the saving working well, going to add the second camera now" />
+    <option name="LAST_COMMIT_MESSAGE" value="Got the saving working well, going to add the second camera now" />
   </component>
 </project>

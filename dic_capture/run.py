@@ -315,11 +315,12 @@ def run(config: Dict[str, Any]):
 
         def update(self):
             self.t0 = time()
+            self.t1 = time()
+            print('time:', (self.t1 - self.t0) / 1000)
             for self.j in range(0, self.super_img_arr_len):
                 self.super_img_arr.append([])
                 # np.append(self.super_img_arr,self.temp)
-            self.t1 = time()
-            print('time:', (self.t1-self.t0)/1000)
+
             #self.k_super = 0
             while True:
                 try:
@@ -340,10 +341,13 @@ def run(config: Dict[str, Any]):
 
         def save_array(self):
             if (record_mode == True):
+                self.t0 = time()
+
                 with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt', 'a') as f:
                     self.heading_cam = 'Frame' + '\t' + 'Frame_Name' + '\t' + 'Cam_Time' + '\n'
                     f.write(self.heading_cam)
-
+                self.t1 = time()
+                print('time:', (self.t1 - self.t0) / 1000)
 
         def continuous_save(self):
             # continually tries to save the data from the supper image array
@@ -468,10 +472,8 @@ def run(config: Dict[str, Any]):
             #cam1.showWindow()
             #cam2.showWindow()
 
-            #threading.Thread(target=cam1.continuous_save, args=(), daemon=True).start()
             cam1.continuous_save()
-            #cam2.continuous_save()
-
+            cam2.continuous_save()
             if record_mode == False:
                 cv2.setMouseCallback(cam1.windowName, cam1.click_event)
                 cv2.setMouseCallback(cam2.windowName, cam2.click_event)
@@ -492,8 +494,8 @@ def run(config: Dict[str, Any]):
         if cv2.waitKey(1) == "TEMPORTY BLOCK":  # ord('q'): #work out a safe command for stopping the program
             logging.info('Exiting program.')
             # cam1.capture.release()
-            cam1.save_buffer_remainder()
-            cam2.save_buffer_remainder()
+            #cam1.save_buffer_remainder()
+            #cam2.save_buffer_remainder()
             print()
             cv2.destroyAllWindows()
             exit(1)

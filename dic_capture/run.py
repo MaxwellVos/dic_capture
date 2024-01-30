@@ -233,7 +233,8 @@ def run(config: Dict[str, Any]):
             self.xPosHist = xPosHist
             self.yPosHist = yPosHist
             self.k_super = 0
-            self.super_img_arr_len = 50
+            self.super_img_arr_len = 250
+            self.save_complete = True
             self.cam_save_dir = cam_save_dir
             self.float_exposure_time = float(exposure_time_ms) * 1000
             self.camera.SetImageBufferCount(20)
@@ -305,7 +306,7 @@ def run(config: Dict[str, Any]):
             self.thread_update.start()
             self.thread_array_read.start()
             self.thread_save_array.start()
-            self.thread_continuous_save_array.start()
+            #self.thread_continuous_save_array.start()
 
         def update(self):
             self.temp = []
@@ -385,40 +386,44 @@ def run(config: Dict[str, Any]):
                     logging.error('Error saving array.')
                     print('save array error')
 
+
         def continuous_save(self):
             # continually tries to save the data from the supper image array
             self.n = 0
-            while True:
-                #print('While true', self.k_super)
-                if self.n < self.k_super:
-                    self.save_arr = self.super_img_arr[self.n]
-                    for self.m in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
+            # print('While true', self.k_super)
+            if self.n < self.k_super:
+                self.save_arr = self.super_img_arr[self.n]
+                for self.m in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
+                    self.t0 = time()
+                    self.img_title = str(test_id) + '_' + str(
+                        self.save_arr[self.m].GetImageID()) + '_' + self.windowName + '.tif'
+                    self.fileName = self.cam_save_dir + '/' + self.img_title
+                    self.save_img = self.save_arr[self.m].GetNPArray()
+                    self.img_ID = self.save_arr[self.m].GetImageID()
+                    self.img_TimeStamp = self.save_arr[self.m].GetTimestamp()
+                    if self.img_TimeStamp != 0:
+                        if (self.img_ID == 0):
+                            self.cam_t0 = self.img_TimeStamp
+                        self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
+                        self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
+                            self.img_TimeStamp_zerod) + '\n'
                         self.t0 = time()
-                        self.img_title = str(test_id) + '_' + str(
-                            self.save_arr[self.m].GetImageID()) + '_' + self.windowName + '.tif'
-                        self.fileName = self.cam_save_dir + '/' + self.img_title
-                        self.save_img = self.save_arr[self.m].GetNPArray()
-                        self.img_ID = self.save_arr[self.m].GetImageID()
-                        self.img_TimeStamp = self.save_arr[self.m].GetTimestamp()
-                        if self.img_TimeStamp != 0:
-                            if (self.img_ID == 0):
-                                self.cam_t0 = self.img_TimeStamp
-                            self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
-                            self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
-                                self.img_TimeStamp_zerod) + '\n'
-                            self.t0 = time()
-                            tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
-                            with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
-                                      'a') as f:
-                                f.write(self.data)
-                            print('saved', self.data)
-                            self.t1 = time()
-                            print('Time:', (self.t1 - self.t0) * 1000)
-                    self.n = self.n + 1
-                    if self.n == self.super_img_arr_len:
-                        self.n = 0
-                else:
-                    pass
+                        #tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
+                        self.save_tif(self.fileName, self.save_img)
+                        #threading.Thread(target=self.save_tif, args=(self.fileName, self.save_img), daemon=True).start()
+                        self.t1 = time()
+                        print('Time:', (self.t1 - self.t0) * 1000)
+                        with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
+                                  'a') as f:
+                            f.write(self.data)
+                        print('saved', self.data)
+
+                self.n = self.n + 1
+                if self.n == self.super_img_arr_len:
+                    self.n = 0
+
+        def save_tif(self, file_name, tif_data):
+            tf.imwrite(file_name, tif_data, photometric='minisblack')
 
         def displayFrame(self):
             try:
@@ -490,6 +495,7 @@ def run(config: Dict[str, Any]):
         cam1.start_vStream()
         cam2.start_vStream()
 
+
         print('Waiting for cameras to initialize.')
         logging.info('Waiting for cameras to initialize.')
         #sleep(2)
@@ -503,8 +509,12 @@ def run(config: Dict[str, Any]):
     while True:
         try:
             #logging.info('Displaying frames.')
-            cam1.showWindow()
-            cam2.showWindow()
+            #cam1.showWindow()
+            #cam2.showWindow()
+
+            #threading.Thread(target=cam1.continuous_save, args=(), daemon=True).start()
+            cam1.continuous_save()
+            #cam2.continuous_save()
 
             if record_mode == False:
                 cv2.setMouseCallback(cam1.windowName, cam1.click_event)

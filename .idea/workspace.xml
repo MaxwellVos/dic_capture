@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="kind of getting the super save array to work. lots more to do">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -53,23 +53,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.DIC_Capture.executor": "Run",
-    "Python.USB test.executor": "Run",
-    "Python.gui.executor": "Run",
-    "Python.run.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "test-new-ram-management",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.DIC_Capture.executor&quot;: &quot;Run&quot;,
+    &quot;Python.USB test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;test-new-ram-management&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.gui">
     <configuration name="USB test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dic_capture" />
@@ -329,7 +329,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706552061893</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out.">
+      <option name="closed" value="true" />
+      <created>1706553902038</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1706553902038</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -364,6 +372,7 @@
     <MESSAGE value="Added funtion to change exposure time live using arrow keys" />
     <MESSAGE value="formatting stuff" />
     <MESSAGE value="kind of getting the super save array to work. lots more to do" />
-    <option name="LAST_COMMIT_MESSAGE" value="kind of getting the super save array to work. lots more to do" />
+    <MESSAGE value="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out." />
+    <option name="LAST_COMMIT_MESSAGE" value="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out." />
   </component>
 </project>

@@ -233,12 +233,17 @@ def run(config: Dict[str, Any]):
             self.xPosHist = xPosHist
             self.yPosHist = yPosHist
             self.k_super = 0
-            self.super_img_arr_len = 250
-            self.save_complete = True
+            self.n = 0
+            self.super_img_arr = []
+            self.img_arr = []
+            self.super_img_arr_len = 300
+            self.count_images_captured = 0
+            self.count_images_saved = 0
+
             self.cam_save_dir = cam_save_dir
             self.float_exposure_time = float(exposure_time_ms) * 1000
-            self.camera.SetImageBufferCount(20)
-            self.camera.SetImageBufferCycleCount(10)
+            self.camera.SetImageBufferCount(1000)
+            self.camera.SetImageBufferCycleCount(cyclecount=999)
             self.camera.f.PixelFormat.SetString('Mono12')
             self.camera.f.ExposureTime.Set(self.float_exposure_time)
             self.camera.f.Gain.Set(1)
@@ -252,21 +257,20 @@ def run(config: Dict[str, Any]):
             # self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
             # self.camera.EnableChunk('ExposureTime')
             # self.camera.EnableEvent("ExposureStart")
-            self.img_arr = []
+
             self.thread_update = Thread(target=self.update, args=())
             self.thread_update.daemon = True
             self.arr_A_full = False
             self.arr_B_full = False
-            self.thread_array_read = Thread(target=self.get_full_arr, args=())
-            self.thread_array_read.daemon = True
+            #self.thread_array_read = Thread(target=self.get_full_arr, args=())
+            #self.thread_array_read.daemon = True
             self.thread_save_array = Thread(target=self.save_array, args=())
             self.thread_save_array.daemon = True
 
             self.thread_continuous_save_array = Thread(target=self.continuous_save, args=())
             self.thread_continuous_save_array.daemon = True
-            self.img_arr_A = []
-            self.img_arr_B = []
-            self.super_img_arr = []
+
+
 
             self.count_img = 0
             self.displayWait = False
@@ -274,6 +278,7 @@ def run(config: Dict[str, Any]):
             self.scale = 0.5
             self.save_last_array = False
             self.cam_t0 = 0
+
 
 
 
@@ -304,124 +309,75 @@ def run(config: Dict[str, Any]):
         def start_vStream(self):
             logging.info('Starting camera thread.')
             self.thread_update.start()
-            self.thread_array_read.start()
+            #self.thread_array_read.start()
             self.thread_save_array.start()
             #self.thread_continuous_save_array.start()
 
         def update(self):
-            self.temp = []
-            for self.a in range(0, self.buffer_arr_max):
-                self.img_arr_A.append(self.temp)
-                self.img_arr_B.append(self.temp)
+            self.t0 = time()
+            for self.j in range(0, self.super_img_arr_len):
+                self.super_img_arr.append([])
+                # np.append(self.super_img_arr,self.temp)
+            self.t1 = time()
+            print('time:', (self.t1-self.t0)/1000)
+            #self.k_super = 0
             while True:
-                for self.b in range(0, self.buffer_arr_max):
-                    try:
-                        self.img = self.camera.GetImage(self.timeOut_ms)
-                        self.img_arr_A[self.b] = self.img
-                    except:
-                        pass
-                        print('Image grab problem print problem')
-                self.arr_A_full = True
-                self.arr_B_full = False
-                for self.c in range(0, self.buffer_arr_max):
-                    try:
-                        self.img = self.camera.GetImage(self.timeOut_ms)
-                        self.img_arr_B[self.c] = self.img
-                    except:
-                        print('Image grab problem print problem')
-                        pass
-                self.arr_A_full = False
-                self.arr_B_full = True
+                try:
+                    self.img = self.camera.GetImage(self.timeOut_ms)
+                    self.super_img_arr[self.k_super] = self.img
+                    self.count_images_captured = self.count_images_captured + 1
+
+                    self.k_super = self.k_super + 1
+                    if self.k_super == self.super_img_arr_len:
+                        self.k_super = 0
+                except:
+                    pass
+                    print('Image grab problem print problem')
+
 
         def save_buffer_remainder(self):
             self.save_last_array = True
 
-        def get_full_arr(self):
-            #while True:
-            if self.arr_A_full:
-                self.arr_A_full = False
-                return self.img_arr_A
-            else:
-                if self.arr_B_full:
-                    self.arr_B_full = False
-                    return self.img_arr_B
-                else:
-                    return 0
-
         def save_array(self):
             if (record_mode == True):
-                for self.j in range(0,self.super_img_arr_len):
-                    self.super_img_arr.append([])
-                    #np.append(self.super_img_arr,self.temp)
-                self.k_super = 0
                 with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt', 'a') as f:
                     self.heading_cam = 'Frame' + '\t' + 'Frame_Name' + '\t' + 'Cam_Time' + '\n'
                     f.write(self.heading_cam)
-            while True:
-                try:
-                    self.img_arr = self.get_full_arr()
-                    if self.save_last_array:
-                        if self.arr_A_full:
-                            self.img_arr = self.img_arr_B
-                        else:
-                            if self.arr_B_full:
-                                self.img_arr = self.img_arr_A
-                            self.save_last_array = False
-
-
-                    if (self.img_arr != 0):
-                        self.frame = self.img_arr[0].GetNPArray()
-                        self.displayWait = False
-                        #threading.Thread(target=self.displayFrame, args=(), daemon=True).start()
-
-                        if (record_mode == True):
-                            #self.super_img_arr.append(self.img_arr)
-                            self.super_img_arr[self.k_super] = self.img_arr
-                            self.k_super = self.k_super + 1
-                            if self.k_super == self.super_img_arr_len:
-                                self.k_super = 0
-
-
-                except:
-                    logging.error('Error saving array.')
-                    print('save array error')
 
 
         def continuous_save(self):
             # continually tries to save the data from the supper image array
-            self.n = 0
-            # print('While true', self.k_super)
-            if self.n < self.k_super:
-                self.save_arr = self.super_img_arr[self.n]
-                for self.m in range(0, self.buffer_arr_max):  # saves an image as .tif and adds image details to .csv file
-                    self.t0 = time()
-                    self.img_title = str(test_id) + '_' + str(
-                        self.save_arr[self.m].GetImageID()) + '_' + self.windowName + '.tif'
+            try:
+                # print('While true', self.k_super)
+                if self.count_images_saved < self.count_images_captured:
+                    self.save_arr = self.super_img_arr[self.n]
+                    self.img_title = str(test_id) + '_' + str(self.save_arr.GetImageID()) + '_' + self.windowName + '.tif'
                     self.fileName = self.cam_save_dir + '/' + self.img_title
-                    self.save_img = self.save_arr[self.m].GetNPArray()
-                    self.img_ID = self.save_arr[self.m].GetImageID()
-                    self.img_TimeStamp = self.save_arr[self.m].GetTimestamp()
+                    self.save_img = self.save_arr.GetNPArray()
+                    self.img_ID = self.save_arr.GetImageID()
+                    self.img_TimeStamp = self.save_arr.GetTimestamp()
                     if self.img_TimeStamp != 0:
                         if (self.img_ID == 0):
                             self.cam_t0 = self.img_TimeStamp
                         self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
                         self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
                             self.img_TimeStamp_zerod) + '\n'
-                        self.t0 = time()
+
                         #tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
                         self.save_tif(self.fileName, self.save_img)
                         #threading.Thread(target=self.save_tif, args=(self.fileName, self.save_img), daemon=True).start()
-                        self.t1 = time()
-                        print('Time:', (self.t1 - self.t0) * 1000)
                         with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
                                   'a') as f:
                             f.write(self.data)
                         print('saved', self.data)
-
-                self.n = self.n + 1
-                if self.n == self.super_img_arr_len:
-                    self.n = 0
-
+                        #self.super_img_arr[self.n] = []
+                        self.count_images_saved = self.count_images_saved + 1
+                        self.n = self.n + 1
+                        if self.n == self.super_img_arr_len:
+                            self.n = 0
+            except:
+                print("Save Problem")
+                pass
         def save_tif(self, file_name, tif_data):
             tf.imwrite(file_name, tif_data, photometric='minisblack')
 

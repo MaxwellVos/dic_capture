@@ -221,6 +221,8 @@ def run(config: Dict[str, Any]):
 
     class vStream():
         def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir, exposure_time_ms):
+
+
             self.buffer_arr_max = int(buffer_arr_max)
             self.timeOut_ms = timeOut_ms
             self.windowName = windowName
@@ -229,6 +231,8 @@ def run(config: Dict[str, Any]):
             self.yPos = yPos
             self.src = src
             self.camera = neoapi.Cam()
+            self.camera.SetImageBufferCount(1000)
+            self.camera.SetImageBufferCycleCount(cyclecount=20)
             self.camera.Connect(self.src)
             self.xPosHist = xPosHist
             self.yPosHist = yPosHist
@@ -242,14 +246,18 @@ def run(config: Dict[str, Any]):
 
             self.cam_save_dir = cam_save_dir
             self.float_exposure_time = float(exposure_time_ms) * 1000
-            self.camera.SetImageBufferCount(1000)
-            self.camera.SetImageBufferCycleCount(cyclecount=999)
+
+
+            self.t0 = time()
+
             self.camera.f.PixelFormat.SetString('Mono12')
             self.camera.f.ExposureTime.Set(self.float_exposure_time)
             self.camera.f.Gain.Set(1)
             self.camera.f.TriggerMode = neoapi.TriggerMode_On
             self.camera.f.TriggerSource = neoapi.TriggerSource_Line2
             self.camera.f.TriggerActivation = neoapi.TriggerActivation_FallingEdge
+            self.t1 = time()
+            print('time:', (self.t1 - self.t0))
             # self.camera.f.TriggerActivation neoapi.AcquisitionStatusSelector_AcquisitionTriggerWait
             # self.cam_event = neoapi.NeoEvent()
             # self.camera.ClearEvents()
@@ -257,6 +265,7 @@ def run(config: Dict[str, Any]):
             # self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
             # self.camera.EnableChunk('ExposureTime')
             # self.camera.EnableEvent("ExposureStart")
+
 
             self.thread_update = Thread(target=self.update, args=())
             self.thread_update.daemon = True
@@ -267,8 +276,8 @@ def run(config: Dict[str, Any]):
             self.thread_save_array = Thread(target=self.save_array, args=())
             self.thread_save_array.daemon = True
 
-            self.thread_continuous_save_array = Thread(target=self.continuous_save, args=())
-            self.thread_continuous_save_array.daemon = True
+            #self.thread_continuous_save_array = Thread(target=self.continuous_save, args=())
+            #self.thread_continuous_save_array.daemon = True
 
 
 
@@ -307,30 +316,31 @@ def run(config: Dict[str, Any]):
                 self.clicked = self.clicked + 1
 
         def start_vStream(self):
+
             logging.info('Starting camera thread.')
             self.thread_update.start()
             #self.thread_array_read.start()
             self.thread_save_array.start()
             #self.thread_continuous_save_array.start()
 
+
         def update(self):
-            self.t0 = time()
-            self.t1 = time()
-            print('time:', (self.t1 - self.t0) / 1000)
+
             for self.j in range(0, self.super_img_arr_len):
                 self.super_img_arr.append([])
-                # np.append(self.super_img_arr,self.temp)
 
             #self.k_super = 0
             while True:
                 try:
                     self.img = self.camera.GetImage(self.timeOut_ms)
+                    #print(self.img)
                     self.super_img_arr[self.k_super] = self.img
                     self.count_images_captured = self.count_images_captured + 1
 
                     self.k_super = self.k_super + 1
                     if self.k_super == self.super_img_arr_len:
                         self.k_super = 0
+                    #print(self.k_super)
                 except:
                     pass
                     print('Image grab problem print problem')
@@ -341,26 +351,24 @@ def run(config: Dict[str, Any]):
 
         def save_array(self):
             if (record_mode == True):
-                self.t0 = time()
-
                 with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt', 'a') as f:
                     self.heading_cam = 'Frame' + '\t' + 'Frame_Name' + '\t' + 'Cam_Time' + '\n'
                     f.write(self.heading_cam)
-                self.t1 = time()
-                print('time:', (self.t1 - self.t0) / 1000)
+
 
         def continuous_save(self):
-            # continually tries to save the data from the supper image array
             try:
                 # print('While true', self.k_super)
                 if self.count_images_saved < self.count_images_captured:
                     self.save_arr = self.super_img_arr[self.n]
                     self.img_title = str(test_id) + '_' + str(self.save_arr.GetImageID()) + '_' + self.windowName + '.tif'
+
                     self.fileName = self.cam_save_dir + '/' + self.img_title
                     self.save_img = self.save_arr.GetNPArray()
                     self.img_ID = self.save_arr.GetImageID()
                     self.img_TimeStamp = self.save_arr.GetTimestamp()
                     if self.img_TimeStamp != 0:
+
                         if (self.img_ID == 0):
                             self.cam_t0 = self.img_TimeStamp
                         self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
@@ -368,7 +376,9 @@ def run(config: Dict[str, Any]):
                             self.img_TimeStamp_zerod) + '\n'
 
                         #tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
+                        print(self.img_title)
                         self.save_tif(self.fileName, self.save_img)
+
                         #threading.Thread(target=self.save_tif, args=(self.fileName, self.save_img), daemon=True).start()
                         with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
                                   'a') as f:
@@ -443,15 +453,18 @@ def run(config: Dict[str, Any]):
         def getTimestamp(self):
             return self.timestamp_arr[1]
 
+
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
 
     try:
         logging.info('Creating camera objects.')
-        cam1 = vStream(cam1_src, '1', 4000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms)
-        cam2 = vStream(cam2_src, '2', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms)
+        cam1 = vStream(cam1_src, '1', 8000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms)
+        cam2 = vStream(cam2_src, '2', 8000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms)
         # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
         logging.info('Starting camera threads.')
+
+        sleep(2)
         cam1.start_vStream()
         cam2.start_vStream()
 

@@ -214,6 +214,7 @@ def run(config: Dict[str, Any]):
                 #print(qValue.decode('ascii'))
                 q_decoded = qValue.decode('ascii')
                 print(q_decoded)
+
                 #qValue_decode_sum = q_decoded + qValue_decode_sum
                 #myList = qValue_decode_sum.splitlines()
                 #print(myList[2])

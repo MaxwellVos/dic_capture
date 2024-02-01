@@ -457,11 +457,13 @@ def run(config: Dict[str, Any]):
 
             cam1.continuous_save()
             cam2.continuous_save()
+
+            key = cv2.waitKeyEx(2)
+            exposure_inc = 1
+
             if record_mode == False:
                 cv2.setMouseCallback(cam1.windowName, cam1.click_event)
                 cv2.setMouseCallback(cam2.windowName, cam2.click_event)
-                key = cv2.waitKeyEx(2)
-                exposure_inc = 1
                 if key == 2555904: #RIGHT arrow key for cam 1
                     cam1.inc_exposure_ms(exposure_inc)
                 elif key == 2424832: #LEFT arrow key for cam 1

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Started working on the display while recording. Need to check what I did with multithreading the showWindow in the past. May be a CV.waitkey is needed as well">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Display working for Record mode">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -380,7 +380,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706775522349</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Display working for Record mode">
+      <option name="closed" value="true" />
+      <created>1706788559048</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1706788559048</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -395,7 +403,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="camera_display True/False enables image display/save on local computer, otherwise used as a trigger and ADC" />
     <MESSAGE value="GUI Merge 0.0.3" />
     <MESSAGE value="Updating local project env" />
     <MESSAGE value="populated requirements workaround and uploaded .whl38" />
@@ -420,6 +427,7 @@
     <MESSAGE value="2 camera save is working, still taking a while to start the stream" />
     <MESSAGE value="sorted out buffer (it needed to be declared before connecting. If buffer count is 1000, camera timeout needs to be set to 8000ms and cycle count needs to be 20" />
     <MESSAGE value="Started working on the display while recording. Need to check what I did with multithreading the showWindow in the past. May be a CV.waitkey is needed as well" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started working on the display while recording. Need to check what I did with multithreading the showWindow in the past. May be a CV.waitkey is needed as well" />
+    <MESSAGE value="Display working for Record mode" />
+    <option name="LAST_COMMIT_MESSAGE" value="Display working for Record mode" />
   </component>
 </project>

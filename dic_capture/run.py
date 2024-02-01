@@ -211,7 +211,8 @@ def run(config: Dict[str, Any]):
                 while ser.inWaiting() == 0:
                     pass
                 qValue = ser.read(ser.in_waiting)
-                print(qValue)
+                qValue_decode = qValue.decode('ascii')
+                print(qValue_decode)
 
             except Exception as e:
                 logging.error(f'Error reading serial output from Arduino in second block: {e}')
@@ -221,7 +222,7 @@ def run(config: Dict[str, Any]):
 
 
     class vStream():
-        def __init__(self, src, windowName, timeOut_ms, max_image_count, xPos, yPos, xPosHist, yPosHist, cam_save_dir, exposure_time_ms, display_skip):
+        def __init__(self, src, windowName, timeOut_ms, max_image_count, xPos, yPos, xPosHist, yPosHist, cam_save_dir, exposure_time_ms, display_skip, cycle_count):
             # Variable declaration
             self.timeOut_ms = timeOut_ms
             self.windowName = windowName
@@ -249,11 +250,12 @@ def run(config: Dict[str, Any]):
             self.cam_t0 = 0
             self.save_array()
             self.show_ready = False
+            self.cycle_count = cycle_count
 
             # Camera setup
             self.camera = neoapi.Cam()
             self.camera.SetImageBufferCount(int(max_image_count))
-            self.camera.SetImageBufferCycleCount(cyclecount=20)
+            self.camera.SetImageBufferCycleCount(cyclecount=self.cycle_count)
             self.camera.Connect(self.src)
             self.t0 = time()
             self.camera.f.PixelFormat.SetString('Mono12')
@@ -293,6 +295,7 @@ def run(config: Dict[str, Any]):
                 self.x_1_scaled = round(self.x_1 / self.scale)
                 self.y_1_scaled = round(self.y_1 / self.scale)
                 self.clicked = self.clicked + 1
+                print('clicked:',self.clicked)
 
         def start_vStream(self):
             logging.info('Starting camera thread.')
@@ -319,8 +322,6 @@ def run(config: Dict[str, Any]):
                     pass
                     print('Image grab problem print problem')
 
-        def save_buffer_remainder(self):
-            self.save_last_array = True
 
         def save_array(self):
             if (record_mode == True):
@@ -333,7 +334,6 @@ def run(config: Dict[str, Any]):
             try:
                 # print('While true', self.k_super)
                 if self.count_images_saved < self.count_images_captured:
-                    print(str(self.count_images_captured - self.count_images_saved))
                     self.save_arr = self.super_img_arr[self.n]
                     self.img_title = str(test_id) + '_' + str(self.save_arr.GetImageID()) + '_' + self.windowName + '.tif'
                     self.fileName = self.cam_save_dir + '/' + self.img_title
@@ -350,19 +350,22 @@ def run(config: Dict[str, Any]):
                         self.print_data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
                             self.img_TimeStamp_zerod)
 
-                        # tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
-                        self.save_tif(self.fileName, self.save_img)
-
-                        with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
-                                  'a') as f:
-                            f.write(self.data)
-                        print('Saved:', self.print_data)
-
-                        self.mod_check = int(self.count_images_saved) % int(self.display_skip)
-                        if self.mod_check == 0:
+                        if record_mode:
+                            # tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
+                            self.save_tif(self.fileName, self.save_img)
+                            with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
+                                      'a') as f:
+                                f.write(self.data)
+                            print('Saved:', self.print_data)
+                            self.mod_check = int(self.count_images_saved) % int(self.display_skip)
+                            if self.mod_check == 0:
+                                self.displayFrame(self.save_img)
+                        else:
                             self.displayFrame(self.save_img)
 
                         self.count_images_saved = self.count_images_saved + 1
+                        if record_mode:
+                            print(str(self.count_images_captured - self.count_images_saved))
                         self.super_img_arr[self.n] = []
                         self.n = self.n + 1
                         if self.n == self.super_img_arr_len:
@@ -391,8 +394,6 @@ def run(config: Dict[str, Any]):
                     self.zoomed_16 = self.frame[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
                     self.zoomed_8 = (self.zoomed_16 / 256).astype(np.uint8)
                     self.zoomed_heat = cv2.applyColorMap(self.zoomed_8, cv2.COLORMAP_TURBO)
-                    #self.t1 = time()
-                    #print((self.t1 - self.t0) * 1000)
                 self.show_ready = True
             except:
                 print('Display problem')
@@ -400,18 +401,32 @@ def run(config: Dict[str, Any]):
         def showWindow(self):
             if self.show_ready:
                 if self.clicked > 0:
-                    self.showHistogram()
-                    cv2.imshow(self.zoomWindowName, self.zoomed_heat)
-                    cv2.namedWindow(self.windowName)
+
+                    # histogram display
+                    try:
+                        self.showHistogram(self.zoomed_8)
+                    except Exception as e:
+                        print(e)
+
+                    # zoomed window display
+                    try:
+                        cv2.namedWindow(self.zoomWindowName)
+                        cv2.imshow(self.zoomWindowName, self.zoomed_heat)
+                    except Exception as e:
+                        print(e)
+
+                    # main window with red rectangle
                     cv2.rectangle(self.img_display, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
+                    cv2.namedWindow(self.windowName)
                     cv2.imshow(self.windowName, self.img_display)
                 else:
                     cv2.namedWindow(self.windowName)
                     cv2.imshow(self.windowName, self.img_display)
                 self.show_ready = False
 
-        def showHistogram(self):
-            self.histr = cv2.calcHist([self.zoomed_8], [0], None, [255], [0, 255])
+        def showHistogram(self, zoomed_img):
+            self.zoomed_hist = zoomed_img
+            self.histr = cv2.calcHist([self.zoomed_hist], [0], None, [255], [0, 255])
             self.histr[254] = self.histr[254] * 10000
             if self.histr[254] > 0:
                 self.histr[254] = int(((max(self.histr) / 10)))
@@ -419,7 +434,7 @@ def run(config: Dict[str, Any]):
             self.hist_width = 260
             self.img_hist = np.zeros((self.hist_height + 1, self.hist_width), dtype=np.uint8)
             for self.k in range(0, 255):
-                self.temp_hist = int((self.histr[self.k] / (max(self.histr))) * self.hist_height)
+                self.temp_hist = int((self.histr[self.k] / (max(self.histr)+0.001)) * self.hist_height)
                 self.img_hist[0:self.temp_hist, self.k] = self.k  # black
             self.img_hist[0:self.temp_hist, 255:self.hist_width] = self.k
             self.img_hist = cv2.flip(self.img_hist, 0)
@@ -435,9 +450,15 @@ def run(config: Dict[str, Any]):
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
     exposure_inc = 1
-    max_image_count = 300
     camera_timeout = 8000   # ms
 
+    if record_mode:
+        max_image_count = 300
+        cycle_count = 20
+    else:
+        max_image_count = 2
+        cycle_count = 1
+        display_skip = 1
 
     try:
         logging.info('Creating camera objects.')
@@ -453,7 +474,8 @@ def run(config: Dict[str, Any]):
                        yPosHist=450,
                        cam_save_dir=cam_1_save_dir,
                        exposure_time_ms=cam1_exposure_time_ms,
-                       display_skip=display_skip)
+                       display_skip=display_skip,
+                       cycle_count=cycle_count)
         cam2 = vStream(src=cam2_src,
                        windowName='2',
                        timeOut_ms=camera_timeout,
@@ -464,10 +486,8 @@ def run(config: Dict[str, Any]):
                        yPosHist=740,
                        cam_save_dir=cam_2_save_dir,
                        exposure_time_ms=cam2_exposure_time_ms,
-                       display_skip=display_skip)
-        #cam2 = vStream(cam2_src, '2', 8000, 1000, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms, display_skip)
-        # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
-
+                       display_skip=display_skip,
+                       cycle_count=cycle_count)
         cam1.start_vStream()
         cam2.start_vStream()
 
@@ -484,17 +504,24 @@ def run(config: Dict[str, Any]):
         try:
             #logging.info('Displaying frames.')
 
-            cam1.showWindow()
-            cam2.showWindow()
+            if record_mode:
 
-            cam1.continuous_save()
-            cam2.continuous_save()
-            key = cv2.waitKeyEx(2)
+                cam1.continuous_save()
+                cam2.continuous_save()
+                cam1.showWindow()
+                cam2.showWindow()
 
+                key = cv2.waitKeyEx(2)
 
-            if record_mode == False:
+            else:
+                cam1.showWindow()
+                cam2.showWindow()
+                cam1.continuous_save()
+                cam2.continuous_save()
                 cv2.setMouseCallback(cam1.windowName, cam1.click_event)
                 cv2.setMouseCallback(cam2.windowName, cam2.click_event)
+                key = cv2.waitKeyEx(2)
+
                 if key == 2555904: #RIGHT arrow key for cam 1
                     cam1.inc_exposure_ms(exposure_inc)
                 elif key == 2424832: #LEFT arrow key for cam 1
@@ -509,9 +536,6 @@ def run(config: Dict[str, Any]):
 
         if cv2.waitKey(1) == "TEMPORTY BLOCK":  # ord('q'): #work out a safe command for stopping the program
             logging.info('Exiting program.')
-            # cam1.capture.release()
-            #cam1.save_buffer_remainder()
-            #cam2.save_buffer_remainder()
             print()
             cv2.destroyAllWindows()
             exit(1)

@@ -6,6 +6,7 @@ clicks the "Run" button. The GUI is used to create a config file, which is then 
 
 import logging
 import os
+import sys
 import threading
 import tkinter.messagebox
 from threading import Thread
@@ -247,6 +248,7 @@ def run(config: Dict[str, Any]):
             self.save_last_array = False
             self.cam_t0 = 0
             self.save_array()
+            self.show_ready = False
 
             # Camera setup
             self.camera = neoapi.Cam()
@@ -331,9 +333,9 @@ def run(config: Dict[str, Any]):
             try:
                 # print('While true', self.k_super)
                 if self.count_images_saved < self.count_images_captured:
+                    print(str(self.count_images_captured - self.count_images_saved))
                     self.save_arr = self.super_img_arr[self.n]
                     self.img_title = str(test_id) + '_' + str(self.save_arr.GetImageID()) + '_' + self.windowName + '.tif'
-
                     self.fileName = self.cam_save_dir + '/' + self.img_title
                     self.save_img = self.save_arr.GetNPArray()
                     self.img_ID = self.save_arr.GetImageID()
@@ -345,6 +347,8 @@ def run(config: Dict[str, Any]):
                         self.img_TimeStamp_zerod = round((self.img_TimeStamp - self.cam_t0) / 1000000)
                         self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
                             self.img_TimeStamp_zerod) + '\n'
+                        self.print_data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
+                            self.img_TimeStamp_zerod)
 
                         # tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
                         self.save_tif(self.fileName, self.save_img)
@@ -352,7 +356,7 @@ def run(config: Dict[str, Any]):
                         with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
                                   'a') as f:
                             f.write(self.data)
-                        print('saved', self.data)
+                        print('Saved:', self.print_data)
 
                         self.mod_check = int(self.count_images_saved) % int(self.display_skip)
                         if self.mod_check == 0:
@@ -380,6 +384,7 @@ def run(config: Dict[str, Any]):
                 self.img_heat_8 = cv2.applyColorMap(self.img_resized_8, cv2.COLORMAP_TURBO)
                 # self.img_heat_8 = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE #use to rotate image if needed
                 self.img_rotated = self.img_heat_8
+                self.img_display = self.img_heat_8
                 self.width = int(self.img_rotated.shape[1])
                 self.height = int(self.img_rotated.shape[0])
                 if self.clicked > 0:
@@ -398,11 +403,11 @@ def run(config: Dict[str, Any]):
                     self.showHistogram()
                     cv2.imshow(self.zoomWindowName, self.zoomed_heat)
                     cv2.namedWindow(self.windowName)
-                    cv2.rectangle(self.img_rotated, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
-                    cv2.imshow(self.windowName, self.img_rotated)
+                    cv2.rectangle(self.img_display, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
+                    cv2.imshow(self.windowName, self.img_display)
                 else:
                     cv2.namedWindow(self.windowName)
-                    cv2.imshow(self.windowName, self.img_rotated)
+                    cv2.imshow(self.windowName, self.img_display)
                 self.show_ready = False
 
         def showHistogram(self):
@@ -429,12 +434,38 @@ def run(config: Dict[str, Any]):
 
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
+    exposure_inc = 1
+    max_image_count = 300
+    camera_timeout = 8000   # ms
+
 
     try:
         logging.info('Creating camera objects.')
         print('Initializing Cameras:')
-        cam1 = vStream(cam1_src, '1', 8000, 1000, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms, display_skip)
-        cam2 = vStream(cam2_src, '2', 8000, 1000, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms, display_skip)
+
+        cam1 = vStream(src=cam1_src,
+                       windowName='1',
+                       timeOut_ms=camera_timeout,
+                       max_image_count=max_image_count,
+                       xPos=-16,
+                       yPos=0,
+                       xPosHist=1655,
+                       yPosHist=450,
+                       cam_save_dir=cam_1_save_dir,
+                       exposure_time_ms=cam1_exposure_time_ms,
+                       display_skip=display_skip)
+        cam2 = vStream(src=cam2_src,
+                       windowName='2',
+                       timeOut_ms=camera_timeout,
+                       max_image_count=max_image_count,
+                       xPos=823,
+                       yPos=0,
+                       xPosHist=1655,
+                       yPosHist=740,
+                       cam_save_dir=cam_2_save_dir,
+                       exposure_time_ms=cam2_exposure_time_ms,
+                       display_skip=display_skip)
+        #cam2 = vStream(cam2_src, '2', 8000, 1000, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms, display_skip)
         # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
 
         cam1.start_vStream()
@@ -452,14 +483,14 @@ def run(config: Dict[str, Any]):
     while True:
         try:
             #logging.info('Displaying frames.')
-            #cam1.showWindow()
-            #cam2.showWindow()
+
+            cam1.showWindow()
+            cam2.showWindow()
 
             cam1.continuous_save()
             cam2.continuous_save()
-
             key = cv2.waitKeyEx(2)
-            exposure_inc = 1
+
 
             if record_mode == False:
                 cv2.setMouseCallback(cam1.windowName, cam1.click_event)

@@ -165,7 +165,7 @@ def run(config: Dict[str, Any]):
 
     # OLD VARIABLE NAMES HERE
     #exposure_time_ms = cam1_exposure_time_ms
-    max_buffer_arr = arduino_max_buffer
+    display_skip = arduino_max_buffer
 
     def get_period_stages():
         return trigger_period_stages_ms
@@ -220,36 +220,40 @@ def run(config: Dict[str, Any]):
 
 
     class vStream():
-        def __init__(self, src, windowName, timeOut_ms, buffer_arr_max, xPos, yPos, xPosHist, yPosHist, cam_save_dir, exposure_time_ms):
-
-
-            self.buffer_arr_max = int(buffer_arr_max)
+        def __init__(self, src, windowName, timeOut_ms, max_image_count, xPos, yPos, xPosHist, yPosHist, cam_save_dir, exposure_time_ms, display_skip):
+            # Variable declaration
             self.timeOut_ms = timeOut_ms
             self.windowName = windowName
             self.zoomWindowName = windowName + ' Zoomed'
             self.xPos = xPos
             self.yPos = yPos
             self.src = src
-            self.camera = neoapi.Cam()
-            self.camera.SetImageBufferCount(1000)
-            self.camera.SetImageBufferCycleCount(cyclecount=20)
-            self.camera.Connect(self.src)
             self.xPosHist = xPosHist
             self.yPosHist = yPosHist
             self.k_super = 0
             self.n = 0
             self.super_img_arr = []
             self.img_arr = []
-            self.super_img_arr_len = 300
+            self.super_img_arr_len = 300    # Limited by computer RAM (this is about 3GB RAM per camera maximum)
             self.count_images_captured = 0
             self.count_images_saved = 0
-
             self.cam_save_dir = cam_save_dir
             self.float_exposure_time = float(exposure_time_ms) * 1000
+            self.display_skip = display_skip
+            self.count_img = 0
+            self.displayWait = False
+            self.clicked = 0
+            self.scale = 0.5
+            self.save_last_array = False
+            self.cam_t0 = 0
+            self.save_array()
 
-
+            # Camera setup
+            self.camera = neoapi.Cam()
+            self.camera.SetImageBufferCount(int(max_image_count))
+            self.camera.SetImageBufferCycleCount(cyclecount=20)
+            self.camera.Connect(self.src)
             self.t0 = time()
-
             self.camera.f.PixelFormat.SetString('Mono12')
             self.camera.f.ExposureTime.Set(self.float_exposure_time)
             self.camera.f.Gain.Set(1)
@@ -257,38 +261,11 @@ def run(config: Dict[str, Any]):
             self.camera.f.TriggerSource = neoapi.TriggerSource_Line2
             self.camera.f.TriggerActivation = neoapi.TriggerActivation_FallingEdge
             self.t1 = time()
-            print('time:', (self.t1 - self.t0))
-            # self.camera.f.TriggerActivation neoapi.AcquisitionStatusSelector_AcquisitionTriggerWait
-            # self.cam_event = neoapi.NeoEvent()
-            # self.camera.ClearEvents()
-            # self.camera.EnableEvent("ExposureStart")
-            # self.camera.EnableChunk('Image')  # enable the Image chunk to receive the data of the image
-            # self.camera.EnableChunk('ExposureTime')
-            # self.camera.EnableEvent("ExposureStart")
+            print('Camera',self.windowName,'initialized in', (self.t1 - self.t0), 'seconds.')
 
 
             self.thread_update = Thread(target=self.update, args=())
             self.thread_update.daemon = True
-            self.arr_A_full = False
-            self.arr_B_full = False
-            #self.thread_array_read = Thread(target=self.get_full_arr, args=())
-            #self.thread_array_read.daemon = True
-            self.thread_save_array = Thread(target=self.save_array, args=())
-            self.thread_save_array.daemon = True
-
-            #self.thread_continuous_save_array = Thread(target=self.continuous_save, args=())
-            #self.thread_continuous_save_array.daemon = True
-
-
-
-            self.count_img = 0
-            self.displayWait = False
-            self.clicked = 0
-            self.scale = 0.5
-            self.save_last_array = False
-            self.cam_t0 = 0
-
-
 
 
         def inc_exposure_ms(self,inc_ms):
@@ -316,13 +293,8 @@ def run(config: Dict[str, Any]):
                 self.clicked = self.clicked + 1
 
         def start_vStream(self):
-
             logging.info('Starting camera thread.')
             self.thread_update.start()
-            #self.thread_array_read.start()
-            self.thread_save_array.start()
-            #self.thread_continuous_save_array.start()
-
 
         def update(self):
 
@@ -344,7 +316,6 @@ def run(config: Dict[str, Any]):
                 except:
                     pass
                     print('Image grab problem print problem')
-
 
         def save_buffer_remainder(self):
             self.save_last_array = True
@@ -375,49 +346,51 @@ def run(config: Dict[str, Any]):
                         self.data = str(self.img_ID) + '\t' + str(self.img_title) + '\t' + str(
                             self.img_TimeStamp_zerod) + '\n'
 
-                        #tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
-                        print(self.img_title)
+                        # tf.imwrite(self.fileName, self.save_img, photometric='minisblack')
                         self.save_tif(self.fileName, self.save_img)
 
-                        #threading.Thread(target=self.save_tif, args=(self.fileName, self.save_img), daemon=True).start()
                         with open(raw_data_save_dir + '/' + test_id + '_CAM_' + self.windowName + '.txt',
                                   'a') as f:
                             f.write(self.data)
                         print('saved', self.data)
-                        #self.super_img_arr[self.n] = []
+
+                        self.mod_check = int(self.count_images_saved) % int(self.display_skip)
+                        if self.mod_check == 0:
+                            self.displayFrame(self.save_img)
+
                         self.count_images_saved = self.count_images_saved + 1
+                        self.super_img_arr[self.n] = []
                         self.n = self.n + 1
                         if self.n == self.super_img_arr_len:
                             self.n = 0
+
             except:
                 print("Save Problem")
                 pass
         def save_tif(self, file_name, tif_data):
             tf.imwrite(file_name, tif_data, photometric='minisblack')
 
-        def displayFrame(self):
+        def displayFrame(self, display_image):
             try:
-                if self.displayWait == False:
-                    #self.t0 = time()
-                    self.heighTest = self.frame.shape[1]
-                    self.widthTest = self.frame.shape[0]
-                    self.img_resized = self.frame[0:self.widthTest:2,0:self.heighTest:2] #uint16
-                    self.img_resized_8 = (self.img_resized / 256).astype(np.uint8)
-                    self.img_heat_8 = cv2.applyColorMap(self.img_resized_8, cv2.COLORMAP_TURBO)
-                    # self.img_heat_8 = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE #use to rotate image if needed
-                    self.img_rotated = self.img_heat_8
-                    self.width = int(self.img_rotated.shape[1])
-                    self.height = int(self.img_rotated.shape[0])
-                    if self.clicked > 0:
-                        self.zoomed_16 = self.frame[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
-                        self.zoomed_8 = (self.zoomed_16 / 256).astype(np.uint8)
-                        self.zoomed_heat = cv2.applyColorMap(self.zoomed_8, cv2.COLORMAP_TURBO)
-                    self.show_ready = True
-                    self.displayWait = True
+                self.frame = display_image
+                self.heighTest = self.frame.shape[1]
+                self.widthTest = self.frame.shape[0]
+                self.img_resized = self.frame[0:self.widthTest:2,0:self.heighTest:2] #uint16
+                self.img_resized_8 = (self.img_resized / 256).astype(np.uint8)
+                self.img_heat_8 = cv2.applyColorMap(self.img_resized_8, cv2.COLORMAP_TURBO)
+                # self.img_heat_8 = cv2.rotate(self.img_heat_8, cv2.ROTATE_90_COUNTERCLOCKWISE #use to rotate image if needed
+                self.img_rotated = self.img_heat_8
+                self.width = int(self.img_rotated.shape[1])
+                self.height = int(self.img_rotated.shape[0])
+                if self.clicked > 0:
+                    self.zoomed_16 = self.frame[self.y_0_scaled: self.y_1_scaled, self.x_0_scaled: self.x_1_scaled]
+                    self.zoomed_8 = (self.zoomed_16 / 256).astype(np.uint8)
+                    self.zoomed_heat = cv2.applyColorMap(self.zoomed_8, cv2.COLORMAP_TURBO)
                     #self.t1 = time()
                     #print((self.t1 - self.t0) * 1000)
+                self.show_ready = True
             except:
-                pass
+                print('Display problem')
 
         def showWindow(self):
             if self.show_ready:
@@ -459,19 +432,16 @@ def run(config: Dict[str, Any]):
 
     try:
         logging.info('Creating camera objects.')
-        cam1 = vStream(cam1_src, '1', 8000, max_buffer_arr, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms)
-        cam2 = vStream(cam2_src, '2', 8000, max_buffer_arr, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms)
+        print('Initializing Cameras:')
+        cam1 = vStream(cam1_src, '1', 8000, 1000, -16, 0, 1655, 450, cam_1_save_dir, cam1_exposure_time_ms, display_skip)
+        cam2 = vStream(cam2_src, '2', 8000, 1000, 823, 0, 1655, 740, cam_2_save_dir, cam2_exposure_time_ms, display_skip)
         # cam3 = vStream(cam3_source, '3', 4000, max_buffer_arr, 823, 0, 1655, 740, cam_3_save_dir)
-        logging.info('Starting camera threads.')
 
-        sleep(2)
         cam1.start_vStream()
         cam2.start_vStream()
 
+        print('READY TO START TEST.')
 
-        print('Waiting for cameras to initialize.')
-        logging.info('Waiting for cameras to initialize.')
-        #sleep(2)
 
     except Exception as e:
         logging.error(f'Error creating camera objects: {e}')

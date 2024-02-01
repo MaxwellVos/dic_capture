@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="2 camera save is working, still taking a while to start the stream">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2024_01_23_12_18_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2024_01_23_12_18__Changes_.xml" beforeDir="false" />
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="sorted out buffer (it needed to be declared before connecting. If buffer count is 1000, camera timeout needs to be set to 8000ms and cycle count needs to be 20">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -364,7 +362,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706622807921</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="sorted out buffer (it needed to be declared before connecting. If buffer count is 1000, camera timeout needs to be set to 8000ms and cycle count needs to be 20">
+      <option name="closed" value="true" />
+      <created>1706707913004</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1706707913004</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -403,6 +409,7 @@
     <MESSAGE value="couldnt get the saving consistent with mutlithreading. Going to Try saving everything and reading from one big array" />
     <MESSAGE value="Got the saving working well, going to add the second camera now" />
     <MESSAGE value="2 camera save is working, still taking a while to start the stream" />
-    <option name="LAST_COMMIT_MESSAGE" value="2 camera save is working, still taking a while to start the stream" />
+    <MESSAGE value="sorted out buffer (it needed to be declared before connecting. If buffer count is 1000, camera timeout needs to be set to 8000ms and cycle count needs to be 20" />
+    <option name="LAST_COMMIT_MESSAGE" value="sorted out buffer (it needed to be declared before connecting. If buffer count is 1000, camera timeout needs to be set to 8000ms and cycle count needs to be 20" />
   </component>
 </project>

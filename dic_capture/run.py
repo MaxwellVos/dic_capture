@@ -205,14 +205,25 @@ def run(config: Dict[str, Any]):
                 logging.error(f'Error reading serial output from Arduino in second block: {e}')
                 print('serial output error in second block')
                 break
-
+        qValue_decode_sum = ''
         while record_mode == False:
             try:
                 while ser.inWaiting() == 0:
                     pass
                 qValue = ser.read(ser.in_waiting)
-                qValue_decode = qValue.decode('ascii')
-                print(qValue_decode)
+                #print(qValue.decode('ascii'))
+                q_decoded = qValue.decode('ascii')
+                print(q_decoded)
+                #qValue_decode_sum = q_decoded + qValue_decode_sum
+                #myList = qValue_decode_sum.splitlines()
+                #print(myList[2])
+
+                #print(myList[0])
+                #qValue_decode_sum = ''
+
+                #print(qValue_decode_sum.decode('ascii'))
+                #myList = qValue_decode_sum.splitlines()
+                #print(myList)
 
             except Exception as e:
                 logging.error(f'Error reading serial output from Arduino in second block: {e}')
@@ -401,20 +412,17 @@ def run(config: Dict[str, Any]):
         def showWindow(self):
             if self.show_ready:
                 if self.clicked > 0:
-
                     # histogram display
                     try:
                         self.showHistogram(self.zoomed_8)
                     except Exception as e:
                         print(e)
-
                     # zoomed window display
                     try:
                         cv2.namedWindow(self.zoomWindowName)
                         cv2.imshow(self.zoomWindowName, self.zoomed_heat)
                     except Exception as e:
                         print(e)
-
                     # main window with red rectangle
                     cv2.rectangle(self.img_display, (self.x_0, self.y_0), (self.x_1, self.y_1), (0, 0, 255), 2)
                     cv2.namedWindow(self.windowName)

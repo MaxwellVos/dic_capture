@@ -182,7 +182,7 @@ def run(config: Dict[str, Any]):
             try:  # reads serial output from audrino
                 ser.write(trigger_period_stages_ms.encode())
                 qValue = ser.readline().strip().decode('ascii')
-                print('serial output: ', qValue)
+                print(qValue)
 
                 if qValue == "RECIEVED":
                     print("Should break here")
@@ -202,34 +202,33 @@ def run(config: Dict[str, Any]):
                     f.write(qValue.decode('ascii'))
 
             except Exception as e:
-                logging.error(f'Error reading serial output from Arduino in second block: {e}')
+                #logging.error(f'Error reading serial output from Arduino in second block: {e}')
                 print('serial output error in second block')
                 break
         qValue_decode_sum = ''
+        event = threading.Event()
         while record_mode == False:
             try:
                 while ser.inWaiting() == 0:
                     pass
                 qValue = ser.read(ser.in_waiting)
                 #print(qValue.decode('ascii'))
-                q_decoded = qValue.decode('ascii')
-                print(q_decoded)
+                qValue = ser.readline().strip().decode('ascii')
+                serial_list = qValue.split(',')
+                adc_1 = serial_list[5]
+                adc_2 = serial_list[6]
+                adc_3 = serial_list[7]
+                adc_4 = serial_list[8]
+                print_string = adc_1+'\t'+'\t'+adc_2+'\t'+'\t'+adc_3+'\t'+'\t'+adc_4
+                print(print_string)
 
-                #qValue_decode_sum = q_decoded + qValue_decode_sum
-                #myList = qValue_decode_sum.splitlines()
-                #print(myList[2])
-
-                #print(myList[0])
-                #qValue_decode_sum = ''
-
-                #print(qValue_decode_sum.decode('ascii'))
-                #myList = qValue_decode_sum.splitlines()
-                #print(myList)
+                event.wait(0.1)
 
             except Exception as e:
-                logging.error(f'Error reading serial output from Arduino in second block: {e}')
-                print('serial output error in second block')
-                break
+                #logging.error(f'Error reading serial output from Arduino in second block: {e}')
+                #print('serial output error in second block')
+                event.wait(0.001)
+
 
 
 
@@ -276,6 +275,7 @@ def run(config: Dict[str, Any]):
             self.camera.f.TriggerMode = neoapi.TriggerMode_On
             self.camera.f.TriggerSource = neoapi.TriggerSource_Line2
             self.camera.f.TriggerActivation = neoapi.TriggerActivation_FallingEdge
+            # use falling edge for thermal camera as well
             self.t1 = time()
             print('Camera',self.windowName,'initialized in', (self.t1 - self.t0), 'seconds.')
 
@@ -459,10 +459,11 @@ def run(config: Dict[str, Any]):
     logging.info('Starting hardware trigger thread.')
     threading.Thread(target=hardware_trigger, args=(), daemon=True).start()
     exposure_inc = 1
-    camera_timeout = 8000   # ms
+    camera_timeout = 9999999   # ms (Had problems with cameras timing out while waiting for test to start if this was
+    # set to a recommended values of 4000ms)
 
     if record_mode:
-        max_image_count = 300
+        max_image_count = 1000
         cycle_count = 20
     else:
         max_image_count = 2
@@ -519,6 +520,7 @@ def run(config: Dict[str, Any]):
                 cam2.continuous_save()
                 cam1.showWindow()
                 cam2.showWindow()
+                #sleep(0.05)
 
                 key = cv2.waitKeyEx(2)
 

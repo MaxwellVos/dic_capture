@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Display working for test mode too. Got it running really fast by using stream mode on the buffer setting (set buffer to 2 and 1 respectfully)">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Trying to get live display of the ADC outputs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -141,8 +141,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.gui" />
-        <item itemvalue="Python.USB test" />
         <item itemvalue="Python.run" />
+        <item itemvalue="Python.USB test" />
         <item itemvalue="Python.USB test" />
         <item itemvalue="Python.run" />
       </list>
@@ -396,7 +396,23 @@
       <option name="project" value="LOCAL" />
       <updated>1706795560904</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Display working for test mode too. Got it running really fast by using stream mode on the buffer setting (set buffer to 2 and 1 respectfully)">
+      <option name="closed" value="true" />
+      <created>1706798457251</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1706798457251</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Trying to get live display of the ADC outputs">
+      <option name="closed" value="true" />
+      <created>1706798517145</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1706798517145</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -411,7 +427,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating local project env" />
     <MESSAGE value="populated requirements workaround and uploaded .whl38" />
     <MESSAGE value="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
     <MESSAGE value="Changed camera FPS to arduino triggering in ms" />
@@ -436,6 +451,7 @@
     <MESSAGE value="Started working on the display while recording. Need to check what I did with multithreading the showWindow in the past. May be a CV.waitkey is needed as well" />
     <MESSAGE value="Display working for Record mode" />
     <MESSAGE value="Display working for test mode too. Got it running really fast by using stream mode on the buffer setting (set buffer to 2 and 1 respectfully)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Display working for test mode too. Got it running really fast by using stream mode on the buffer setting (set buffer to 2 and 1 respectfully)" />
+    <MESSAGE value="Trying to get live display of the ADC outputs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Trying to get live display of the ADC outputs" />
   </component>
 </project>

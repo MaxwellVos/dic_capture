@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Trying to get live display of the ADC outputs">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?">
+      <change afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
@@ -412,7 +413,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706798517145</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?">
+      <option name="closed" value="true" />
+      <created>1709544982318</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1709544982318</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -427,7 +436,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="populated requirements workaround and uploaded .whl38" />
     <MESSAGE value="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
     <MESSAGE value="Changed camera FPS to arduino triggering in ms" />
     <MESSAGE value="made gui period list be compatable with the run hardware trigger function in ms" />
@@ -452,6 +460,7 @@
     <MESSAGE value="Display working for Record mode" />
     <MESSAGE value="Display working for test mode too. Got it running really fast by using stream mode on the buffer setting (set buffer to 2 and 1 respectfully)" />
     <MESSAGE value="Trying to get live display of the ADC outputs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Trying to get live display of the ADC outputs" />
+    <MESSAGE value="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?" />
+    <option name="LAST_COMMIT_MESSAGE" value="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?" />
   </component>
 </project>

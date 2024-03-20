@@ -221,8 +221,8 @@ def run(config: Dict[str, Any]):
                 adc_4 = serial_list[8]
                 print_string = adc_1+'\t'+'\t'+adc_2+'\t'+'\t'+adc_3+'\t'+'\t'+adc_4
                 print(print_string)
-
-                event.wait(0.1)
+                #displays the adc values every 1 second
+                event.wait(1)
 
             except Exception as e:
                 #logging.error(f'Error reading serial output from Arduino in second block: {e}')

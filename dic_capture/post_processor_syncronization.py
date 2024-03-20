@@ -65,96 +65,57 @@ gleeble_units_df = gleeble_df.iloc[0]
 
 
 #arduino_df['Time'] = arduino_df['Time'].astype(float)
-print(gleeble_units_df)
+#print(gleeble_units_df)
 gleeble_df = gleeble_df.drop([0])
 gleeble_reordered_df = pd.DataFrame()
 print(gleeble_df.iloc[:0,0].name)
-gleeble_reordered_df['Time ' + gleeble_units_df[gleeble_df.iloc[:0,0].name]] = gleeble_df[gleeble_df.iloc[:0,0].name].astype(float)
-gleeble_reordered_df['Time (msec)'] = gleeble_reordered_df['Time ' + gleeble_units_df[gleeble_df.iloc[:0,0].name]].mul(1000)
+gleeble_reordered_df['Time' + gleeble_units_df[gleeble_df.iloc[:0,0].name]] = gleeble_df[gleeble_df.iloc[:0,0].name].astype(float)
+gleeble_reordered_df['Time(msec)'] = gleeble_reordered_df['Time' + gleeble_units_df[gleeble_df.iloc[:0,0].name]].mul(1000)
 #['DIC_Trigger'] = gleeble_df['DIC.trigger'].astype(float)
 
 
 for k in range(1,len(gleeble_df.axes[1])):
     parameter = gleeble_df.iloc[:0, k].name
     unit = gleeble_units_df[gleeble_df.iloc[:0,k].name]
-    parameter_unit = str(parameter) + ' ' + str(unit)
-
+    parameter_unit = str(parameter) + str(unit)
     gleeble_reordered_df[parameter_unit] = gleeble_df.iloc[:,k].astype(float)
 
-print(gleeble_reordered_df.info())
+col_name = 'DIC.trigger(lbloo)'
+DIC_index = gleeble_reordered_df.columns.get_loc(col_name)
+#print(gleeble_reordered_df.iloc[:0,17].name)
+#print(gleeble_reordered_df.iat[3,DIC_index])
+#print(gleeble_reordered_df.inf)
+DIC_trig_prev = 0
+DIC_trig_times_df = pd.DataFrame(columns = ['GleebleTrigTime'])
+for k in range(1,len(gleeble_reordered_df.axes[0])):
+    DIC_trig_current = gleeble_reordered_df.iat[k,DIC_index]
+    # finds rising edge to the nearest msec
+    if (DIC_trig_current>0) and (DIC_trig_prev == 0):
+        print(gleeble_reordered_df.iat[k,1])
+        DIC_trig_times_df = DIC_trig_times_df._append({'GleebleTrigTime': gleeble_reordered_df.iat[k,1]},
+                                                  ignore_index=True)
+    DIC_trig_prev = DIC_trig_current
 
-#gleeble_df = gleeble_df[['Time','quench4','Force','Jaw','Strain','Stress','Stroke','wedge','TC1','TC2','PTemp']]
-#gleeble_copy_df = gleeble_df
+DIC_trig_times_df.drop(index=DIC_trig_times_df.index[-1],axis=0,inplace=True)
 
-gleeble_copy_df['Time'] = gleeble_copy_df['Time'].astype(float)
-gleeble_copy_df['Time(ms)'] = gleeble_copy_df['Time'].mul(1000)
-gleeble_copy_df['quench4'] = gleeble_copy_df['quench4'].astype(float)
-gleeble_copy_df['Force'] = gleeble_copy_df['Force'].astype(float)
-gleeble_copy_df['Jaw'] = gleeble_copy_df['Jaw'].astype(float)
-gleeble_copy_df['Strain'] = gleeble_copy_df['Strain'].astype(float)
-gleeble_copy_df['Stress'] = gleeble_copy_df['Stress'].astype(float)
-gleeble_copy_df['Stroke'] = gleeble_copy_df['Stroke'].astype(float)
-gleeble_copy_df['wedge'] = gleeble_copy_df['wedge'].astype(float)
-gleeble_copy_df['TC1'] = gleeble_copy_df['TC1'].astype(float)
-gleeble_copy_df['TC2'] = gleeble_copy_df['TC2'].astype(float)
-gleeble_copy_df['PTemp'] = gleeble_copy_df['PTemp'].astype(float)
+print(DIC_trig_times_df)
+#DIC_trig_times_df['GleebleTrigTime'] = DIC_trig_times_df['GleebleTrigTime'].sub(DIC_trig_times_df['GleebleTrigTime'].min())
+#print(DIC_trig_times_df)
 
-gleeble_df['Time'] = gleeble_df['Time'].astype(float)
-gleeble_df['quench4'] = gleeble_df['quench4'].astype(float)
-
-gleeble_df['Time'] = gleeble_df['Time'].mul(1000)
-gleeble_df['quench4'] = gleeble_df['quench4'].round(6)
-gleeble_df['quench4_diff'] = gleeble_df['quench4'].diff()
-gleeble_df = gleeble_df[gleeble_df['quench4_diff']!=0]
-gleeble_df = gleeble_df.dropna()
-gleeble_df_pos = gleeble_df[gleeble_df['quench4_diff'] > 0]
-gleeble_df_neg = gleeble_df[gleeble_df['quench4_diff'] < 0]
-gleeble_copy_df.reset_index(drop = True, inplace=True)
-
-new_row = pd.DataFrame({'Time':0.0, 'quench4':0.0, 'quench4_diff':0.0}, index=[0])
-gleeble_df_pos = pd.concat([new_row,gleeble_df_pos.loc[:]]).reset_index(drop=True)
-gleeble_df_neg = pd.concat([new_row,gleeble_df_neg.loc[:]]).reset_index(drop=True)
-gleeble_df_pos_start = gleeble_df_pos[(gleeble_df_pos['Time'].diff() > 10)]
-gleeble_df_neg_start = gleeble_df_neg[(gleeble_df_neg['Time'].diff() > 10)]
-quench_times_df = pd.DataFrame(columns = ['GleebleQuenchTime','QuenchTurned'])
-
-start_count = gleeble_df_pos_start.shape[0]
-for k in range(0,start_count):
-    start_time = gleeble_df_pos_start.iat[k,0]
-    end_time = start_time + 95 #quench takes 100ms to go from 0 to 1 or vise versa
-    single_quench_df = gleeble_df[gleeble_df['Time'].between(start_time,end_time)]
-    x_temp = np.array(single_quench_df['Time'])
-    y_temp = np.array(single_quench_df['quench4'])
-    m, b = np.polyfit(x_temp, y_temp, 1) # y = mx + b
-    y_intercept =  round(-b/m,3) #For sloping upwards, we are interested in the x value that corresponds with y=0 as that is when the quench started
-    quench_times_df = quench_times_df._append({'GleebleQuenchTime' : y_intercept,'QuenchTurned' : 'ON'}, ignore_index = True)
-
-start_count = gleeble_df_neg_start.shape[0]
-for k in range(0,start_count):
-    start_time = gleeble_df_neg_start.iat[k,0]
-    end_time = start_time + 95 #quench takes 100ms to go from 0 to 1 or vise versa
-    single_quench_df = gleeble_df[gleeble_df['Time'].between(start_time,end_time)]
-    x_temp = np.array(single_quench_df['Time'])
-    y_temp = np.array(single_quench_df['quench4'])
-    m, b = np.polyfit(x_temp, y_temp, 1) # y = mx + b
-    y_intercept =  round((1-b)/m,3) #For sloping downwards, we are interested in the x value that corresponds with y=1 as that is when the quench started
-    quench_times_df = quench_times_df._append({'GleebleQuenchTime' : y_intercept,'QuenchTurned' : 'OFF'}, ignore_index = True)
-
-quench_times_df = quench_times_df.sort_values(by = 'GleebleQuenchTime', ascending = True)
-gleeble_quench_times_df= quench_times_df.reset_index(drop=True) #use this to sync with Arduino clock
-arduino_df.columns = ['Frame', 'Time', 'State', 'Count', 'LastTime']
+arduino_df.columns = ['trigger_frame_count','adc_frame_count','test_run_time','fps_change_count','fps_change_time','adc.ch1_volts','adc.ch2_volts','adc.ch3_volts','adc.ch4_volts','data_delta']
 arduino_quench_times_df = arduino_df.iloc[:,4]
-quench_times_list = arduino_quench_times_df.unique()
-gleeble_quench_times_df = gleeble_quench_times_df[:-1]
+arduino_fps_change_times = arduino_quench_times_df.unique()
+print(arduino_fps_change_times)
 
 
-gleeble_quench_times_df.insert(1,'ArduinoQuenchTimes',quench_times_list,True)
+DIC_trig_times_df.insert(1,'ArduinoTrigTimes',arduino_fps_change_times,True)
+DIC_trig_times_df['ArduinoTrigTimes'] = DIC_trig_times_df['ArduinoTrigTimes'].add(DIC_trig_times_df['GleebleTrigTime'].min())
 
-gleeble_t0 = gleeble_quench_times_df.iat[0,0]
-
-gleeble_quench_times_df['TranslatedArd'] = gleeble_quench_times_df['ArduinoQuenchTimes'].add(gleeble_t0)
-gleeble_quench_times_df['Difference'] = gleeble_quench_times_df['GleebleQuenchTime'].sub(gleeble_quench_times_df['TranslatedArd'])
-gleeble_quench_times_df['DifferenceRatio'] = gleeble_quench_times_df['GleebleQuenchTime'].div(gleeble_quench_times_df['TranslatedArd'])
+#DIC_trig_times_df['TranslatedArd'] = gleeble_quench_times_df['ArduinoQuenchTimes'].add(gleeble_t0)
+DIC_trig_times_df['Difference'] = DIC_trig_times_df['GleebleTrigTime'].sub(DIC_trig_times_df['ArduinoTrigTimes'])
+print(DIC_trig_times_df)
+////////////////////////////////////////////
+gleeble_quench_times_df['DifferenceRatio'] = gleeble_quench_times_df['GleebleTrigTime'].div(gleeble_quench_times_df['ArduinoTrigTimes'])
 gleeble_quench_times_df['GleebeArduinoDiff'] = gleeble_quench_times_df['GleebleQuenchTime'].sub(gleeble_quench_times_df['ArduinoQuenchTimes'])
 
 average_difference_ratio = gleeble_quench_times_df["DifferenceRatio"].mean()

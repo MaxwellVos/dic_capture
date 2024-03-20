@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Working on getting the reorded DF to have units automatically pulled in.">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Almost there, have the differences quantified. Seems to be around a 50ms offset?">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
     </list>
@@ -513,7 +513,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710942283686</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Almost there, have the differences quantified. Seems to be around a 50ms offset?">
+      <option name="closed" value="true" />
+      <created>1710947500279</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1710947500279</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -528,7 +536,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="got the gui and run to talk nicely" />
     <MESSAGE value="made combo boxes auto populate with first item in their list. Not ideal for the cameras but could be improved later" />
     <MESSAGE value="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow" />
     <MESSAGE value="Managed to get the cameras working and close the GUI after clicking the test run button" />
@@ -553,6 +560,7 @@
     <MESSAGE value="Brought across the old sync script and started working on it" />
     <MESSAGE value="Changed logo" />
     <MESSAGE value="Working on getting the reorded DF to have units automatically pulled in." />
-    <option name="LAST_COMMIT_MESSAGE" value="Working on getting the reorded DF to have units automatically pulled in." />
+    <MESSAGE value="Almost there, have the differences quantified. Seems to be around a 50ms offset?" />
+    <option name="LAST_COMMIT_MESSAGE" value="Almost there, have the differences quantified. Seems to be around a 50ms offset?" />
   </component>
 </project>

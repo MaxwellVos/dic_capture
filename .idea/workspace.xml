@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?">
-      <change afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
-    </list>
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Brought across the old sync script and started working on it" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -421,7 +417,15 @@
       <option name="project" value="LOCAL" />
       <updated>1709544982318</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Brought across the old sync script and started working on it">
+      <option name="closed" value="true" />
+      <created>1710925949588</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1710925949588</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -436,7 +440,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed gui resolution-scaling issues, added camera port finding for camera drop down and made function to get camera serial numbers (not sure if that is completely necisarry" />
     <MESSAGE value="Changed camera FPS to arduino triggering in ms" />
     <MESSAGE value="made gui period list be compatable with the run hardware trigger function in ms" />
     <MESSAGE value="got the gui and run to talk nicely" />
@@ -461,6 +464,7 @@
     <MESSAGE value="Display working for test mode too. Got it running really fast by using stream mode on the buffer setting (set buffer to 2 and 1 respectfully)" />
     <MESSAGE value="Trying to get live display of the ADC outputs" />
     <MESSAGE value="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?" />
-    <option name="LAST_COMMIT_MESSAGE" value="All seems to be working. Sometimes one camera takes a bunch more images in addition to the scheduled image. Because this only happens with one camera it could be EMF during a test (this effect has only been observed during tests) or possibly the triggering circuit is faulty. Problem is too intermittent to be sure. Maybe check if it is consistently the came triggering port that does this?" />
+    <MESSAGE value="Brought across the old sync script and started working on it" />
+    <option name="LAST_COMMIT_MESSAGE" value="Brought across the old sync script and started working on it" />
   </component>
 </project>

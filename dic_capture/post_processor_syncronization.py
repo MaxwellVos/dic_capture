@@ -25,7 +25,7 @@ cam_2_path = 'EMPTY'
 cam_3_path = 'EMPTY'
 gleeble_path = 'EMPTY'
 
-test_folder_dir  = easygui.diropenbox(default='C:/Users/maxwe/OneDrive/Documents/Masters/Test_Data',
+test_folder_dir  = easygui.diropenbox(default='C:/Users/maxwe/OneDrive/Documents/Masters/Test_Data/Sync Data V3/Nkopo_2024_026',
                                       title='The test_data folder for the test. It should be the same as the TEST ID')
 raw_data_dir = os.path.join(test_folder_dir, "Raw_Data")
 synced_data_dir = os.path.join(test_folder_dir, "Synced_Data")
@@ -58,12 +58,33 @@ if (gleeble_path == 'EMPTY'):
     print(gleeble_path)
 
 gleeble_df = pd.read_csv(gleeble_path, sep='\t', lineterminator='\n')
-arduino_df = pd.read_csv(arduino_path, sep='\t', lineterminator='\n')
+arduino_df = pd.read_csv(arduino_path, sep=',', lineterminator='\n')
 
-arduino_df['Time'] = arduino_df['Time'].astype(float)
+
+gleeble_units_df = gleeble_df.iloc[0]
+
+
+#arduino_df['Time'] = arduino_df['Time'].astype(float)
+print(gleeble_units_df)
 gleeble_df = gleeble_df.drop([0])
-gleeble_df = gleeble_df[['Time','quench4','Force','Jaw','Strain','Stress','Stroke','wedge','TC1','TC2','PTemp']]
-gleeble_copy_df = gleeble_df
+gleeble_reordered_df = pd.DataFrame()
+print(gleeble_df.iloc[:0,0].name)
+gleeble_reordered_df['Time ' + gleeble_units_df[gleeble_df.iloc[:0,0].name]] = gleeble_df[gleeble_df.iloc[:0,0].name].astype(float)
+gleeble_reordered_df['Time (msec)'] = gleeble_reordered_df['Time ' + gleeble_units_df[gleeble_df.iloc[:0,0].name]].mul(1000)
+#['DIC_Trigger'] = gleeble_df['DIC.trigger'].astype(float)
+
+
+for k in range(1,len(gleeble_df.axes[1])):
+    parameter = gleeble_df.iloc[:0, k].name
+    unit = gleeble_units_df[gleeble_df.iloc[:0,k].name]
+    parameter_unit = str(parameter) + ' ' + str(unit)
+
+    gleeble_reordered_df[parameter_unit] = gleeble_df.iloc[:,k].astype(float)
+
+print(gleeble_reordered_df.info())
+
+#gleeble_df = gleeble_df[['Time','quench4','Force','Jaw','Strain','Stress','Stroke','wedge','TC1','TC2','PTemp']]
+#gleeble_copy_df = gleeble_df
 
 gleeble_copy_df['Time'] = gleeble_copy_df['Time'].astype(float)
 gleeble_copy_df['Time(ms)'] = gleeble_copy_df['Time'].mul(1000)

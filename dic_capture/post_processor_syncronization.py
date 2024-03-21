@@ -6,7 +6,24 @@ import os
 import easygui
 import numpy as np
 import shutil
+import matplotlib.pyplot as plt
 
+# first set up adc channels and set names. Polynomial conversions may be added later so this is kept basic for now.
+adc1_name = 'adc1'
+adc1_mul_constant = 1
+adc1_offset_constant = 0
+
+adc2_name = 'adc2'
+adc2_mul_constant = 1
+adc2_offset_constant = 0
+
+adc3_name = 'adc3'
+adc3_mul_constant = 1
+adc3_offset_constant = 0
+
+adc4_name = 'Force(kN)'
+adc4_mul_constant = 20 # +-10V on a +-200kN loadcell
+adc4_offset_constant = 0
 
 def find_neighbours(value, df, colname):
     exactmatch = df[df[colname] == value]
@@ -142,6 +159,9 @@ zero_offset = DIC_trig_times_df['GleebleTrigTime(msec)'].min()
 DIC_trig_times_df['ArduinoTrigTimes(msec)'] = (DIC_trig_times_df['ArduinoTrigTimes(msec)']
                                                .add(zero_offset))
 
+arduino_df['GleebleTime(msec)'] = arduino_df['test_run_time'].add(zero_offset)
+
+
 DIC_trig_times_df['Difference(msec)'] = (DIC_trig_times_df['GleebleTrigTime(msec)']
                                          .sub(DIC_trig_times_df['ArduinoTrigTimes(msec)'])
                                          .round(2))
@@ -154,41 +174,39 @@ print(DIC_trig_times_df)
 # force or jaw, thus any corrections would just throw things out further. If high accuracy temporal syncing is
 # required, using the ADC values is still the best method.
 
-
+# saving the timing different file as a troubleshooting tool in the future
 Trigger_file_name = synced_data_dir + '\Trigger_Timing_Differences_' + test_ID + '.csv'
 DIC_trig_times_df.to_csv(Trigger_file_name)
 
 max_timing_diff = DIC_trig_times_df['Difference(msec)'].abs().max()
-if max_timing_diff > 10:
+if max_timing_diff > 100:
     print('Largest timing difference is', max_timing_diff,
           'msec which is greater than the threshold of 100msec and the data should therefore be checked.')
 
-for k in range(0, start_count):
-    start_time = gleeble_quench_times_df.iat[k, 1]
-    if (k == start_count - 1):
-        end_time = arduino_df.iat[-1, 1]
-    else:
-        end_time = gleeble_quench_times_df.iat[k + 1, 1]
-    single_ard_df = arduino_df[arduino_df['Time'].between(start_time, end_time, inclusive='left')]
+arduino_df[adc1_name] = (arduino_df['adc.ch1_volts']
+                         .mul(adc1_mul_constant)
+                         .add(adc1_offset_constant))
 
-    col_loc = gleeble_quench_times_df.columns.get_loc
-    temp_add = gleeble_quench_times_df.iat[k, col_loc('GleebeArduinoDiff')]
-    arduino_df.loc[arduino_df['Time'].between(start_time, end_time), 'AddedTime'] = arduino_df['Time'].add(temp_add)
+arduino_df[adc2_name] = (arduino_df['adc.ch2_volts']
+                         .mul(adc2_mul_constant)
+                         .add(adc2_offset_constant))
 
-    if (k == start_count - 1):
-        arduino_df.loc[arduino_df['Time'].between(start_time, end_time), 'MultTime'] = arduino_df['AddedTime'].mul(
-            average_difference_ratio)
-    else:
-        temp_mult = gleeble_quench_times_df.iat[k + 1, col_loc('DifferenceRatio')]
-        arduino_df.loc[arduino_df['Time'].between(start_time, end_time), 'MultTime'] = arduino_df['AddedTime'].mul(
-            temp_mult)
+arduino_df[adc3_name] = (arduino_df['adc.ch3_volts']
+                         .mul(adc3_mul_constant)
+                         .add(adc3_offset_constant))
 
-frame_time_df = arduino_df[['Frame', 'MultTime']]
-output_len = frame_time_df.shape[0]
-col_loc = gleeble_copy_df.columns.get_loc
-gleeble_copy_df['FrameTriggered'] = 0
-number_of_col = gleeble_copy_df.shape[1]
-column_names_list = list(gleeble_copy_df)
+arduino_df[adc4_name] = (arduino_df['adc.ch4_volts']
+                         .mul(adc4_mul_constant)
+                         .add(adc4_offset_constant))
+print(arduino_df)
+
+x1 = arduino_df['GleebleTime(msec)']
+y1 = arduino_df[adc4_name]
+plt.scatter(x1,y1)
+plt.plot(x1,y1)
+plt.show()
+
+///////////////////////////////
 
 for k in range(0, output_len):
     frame_time = frame_time_df.iat[k, 1]

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Almost there, have the differences quantified. Seems to be around a 50ms offset?">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="House keeping and added some comments">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
     </list>
@@ -529,7 +529,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710947535927</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="House keeping and added some comments">
+      <option name="closed" value="true" />
+      <created>1711016808918</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1711016808918</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -544,7 +552,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="made combo boxes auto populate with first item in their list. Not ideal for the cameras but could be improved later" />
     <MESSAGE value="Camera frames are not showing, i suspect that the mainloop is messing with things. tried .destroy but no luck. Will try and fix tomorrow" />
     <MESSAGE value="Managed to get the cameras working and close the GUI after clicking the test run button" />
     <MESSAGE value="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter" />
@@ -569,6 +576,7 @@
     <MESSAGE value="Changed logo" />
     <MESSAGE value="Working on getting the reorded DF to have units automatically pulled in." />
     <MESSAGE value="Almost there, have the differences quantified. Seems to be around a 50ms offset?" />
-    <option name="LAST_COMMIT_MESSAGE" value="Almost there, have the differences quantified. Seems to be around a 50ms offset?" />
+    <MESSAGE value="House keeping and added some comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="House keeping and added some comments" />
   </component>
 </project>

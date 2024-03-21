@@ -256,20 +256,18 @@ if show_force_plot:
     plt.legend(loc='lower right')
     plt.show()
 
-# interpolate frame data into gleeble data
+
+# create a common column of Time(msec) so that the df concat doesnt merge rows
 arduino_frame_df['Time(msec)'] = arduino_frame_df['GleebleTime(msec)']
 combined_df = pd.concat([gleeble_reordered_df, arduino_frame_df], ignore_index=True, sort=False)
-
 combined_df = combined_df.sort_values(by=['Time(msec)'], ignore_index=True, ascending=True)
-print(combined_df.info())
-
-
-
 number_of_col = len(gleeble_reordered_df.axes[1])
 col_name = 'trigger_frame_count'
 combined_index = combined_df.columns.get_loc(col_name)
 combined_number_of_rows = len(combined_df.axes[0])
+matchID_df = pd.DataFrame()
 
+# interpolate frame data into gleeble data
 for k in range(0, combined_number_of_rows):
     # definitly not the fastst code but it gets the job done
     if combined_df.isnull().iloc[k, 0]:
@@ -287,11 +285,14 @@ for k in range(0, combined_number_of_rows):
         previous_time = combined_df.iloc[k_previous, 1]
         next_time = combined_df.iloc[k_next, 1]
         current_time = combined_df.iloc[k, 1]
-
         interpolate_ratio = (current_time - previous_time) / (next_time - previous_time)
+        # time(sec) is done seperately as its linked to time(ms) and rounnding errors in the interpolate function
+        # could mess with the value
         interpolated_val_time = (previous_time + (next_time - previous_time) * interpolate_ratio)/1000
         combined_df.iloc[k, 0] = interpolated_val_time
 
+        # cycles through the columns of the gleeble_reordered_df headings and interpolates the values so that each
+        # DIC frame has the assosiated Gleeble data with it.
         for j in range(2, number_of_col):
             prev_value = combined_df.iloc[k_previous, j]
             next_value = combined_df.iloc[k_next, j]
@@ -299,83 +300,121 @@ for k in range(0, combined_number_of_rows):
             combined_df.iloc[k, j] = interpolated_val
 
         print('Frame Number:', round(combined_df.iloc[k, combined_index]))
+        # builds the df used to output the MatchID .csv file
+        matchID_df = matchID_df._append(combined_df.loc[k, :], ignore_index=True)
 
-
-combined_file_name = synced_data_dir + '\combinedDF_' + test_ID + '.csv'
-combined_df.to_csv(combined_file_name)
-
-for k in range(0, len(arduino_frame_df.axes[0])):
-    frame_time = arduino_frame_df.iat[k, 10]
-    try:
-        lower_ind, upper_ind = find_neighbours(frame_time, gleeble_reordered_df, 'Time(msec)')
-    except:
-        print('Neighbour problem')
-    #print(lower_ind, 'lowIND')
-    lower_time = gleeble_reordered_df.iat[lower_ind, gleeble_index]
-    upper_time = gleeble_reordered_df.iat[upper_ind, gleeble_index]
-    average_ind = (upper_ind + lower_ind) / 2
-    gleeble_reordered_df.loc[average_ind] = np.nan
-    if (upper_time - lower_time) ==0:
-        interpolate_ratio = 1
-    else:
-        interpolate_ratio = (frame_time - lower_time) / (upper_time - lower_time)
-    gleeble_reordered_df.loc[average_ind, 'Time(msec)'] = frame_time
-
-    for j in range(0, number_of_col):
-        lower_val = gleeble_reordered_df.iat[lower_ind[0], j]
-        upper_val = gleeble_reordered_df.iat[upper_ind[0], j]
-        interpolated_val = lower_val + (upper_val - lower_val) * interpolate_ratio
-        #print(interpolated_val,'intVAL')
-        if (j == number_of_col - 1):
-            gleeble_reordered_df.loc[average_ind, 'FrameTriggered'] = 1
-        else:
-            gleeble_reordered_df.loc[average_ind, gleeble_reordered_df.iloc[:0, j].name] = interpolated_val
-            #print(gleeble_reordered_df.loc[average_ind, gleeble_reordered_df.iloc[:0, j].name])
-
-    gleeble_reordered_df = gleeble_reordered_df.sort_index().reset_index(drop=True)
-    #print(gleeble_reordered_df.info())
-    #print(gleeble_reordered_df)
-
-
-gleeble_copy_df = gleeble_copy_df.drop(['Time(ms)', 'quench4_diff'], axis=1)
-gleeble_copy_df.columns = ['Time(s)', 'Quench4', 'Force(kN)', 'Jaw(mm)', 'Strain', 'Stress(MPa)', 'Stroke(mm)',
-                           'Wedge(mm)', 'TC1', 'TC2', 'PTemp', 'FrameTriggered']
-gleeble_copy_df['Time(s)'] = gleeble_copy_df['Time(s)'].div(1000)
-
-gleeble_copy_df.columns = ['Time [s]', 'Quench4 []', 'Force[kN]', 'Jaw[mm]', 'Strain []', 'Stress [MPa]', 'Stroke [mm]',
-                           'Wedge [mm]', 'TC1 [C]', 'TC2 [C]', 'PTemp [C]', 'FrameTriggered []']
-
-camera_output_df = gleeble_copy_df[gleeble_copy_df['FrameTriggered []'].between(0.5, 1.5)]
-camera_output_df = camera_output_df.sort_index().reset_index(drop=True)
-camera_output_df = camera_output_df.drop(['FrameTriggered []'], axis=1)
-
+# gets the names of the images from the CAMx .txt file created in the run.py module when recording.
+frame_name_from_cam_df = pd.DataFrame()
 if (cam_1_path != 'EMPTY'):
-    cam_1_df = pd.read_csv(cam_1_path, sep='\t', lineterminator='\n')
-    camera_output_df['Cam1_FrameName'] = cam_1_df['Frame_Name']
-if (cam_2_path != 'EMPTY'):
-    cam_2_df = pd.read_csv(cam_2_path, sep='\t', lineterminator='\n')
-    camera_output_df['Cam2_FrameName'] = cam_2_df['Frame_Name']
-if (cam_3_path != 'EMPTY'):
-    cam_3_df = pd.read_csv(cam_3_path, sep='\t', lineterminator='\n')
-    camera_output_df['Cam3_FrameName'] = cam_3_df['Frame_Name']
+    frame_name_from_cam_df = pd.read_csv(cam_1_path, sep='\t', lineterminator='\n')
+    matchID_df.insert(0, 'File', frame_name_from_cam_df['Frame_Name'], True)
 
-acquision_file_df = camera_output_df
+#
+matchID_df = matchID_df.drop(['Time(msec)'], axis=1)
+combined_df = combined_df.drop(['Time(msec)'], axis=1)
 
-acquision_file_df.insert(0, 'File', camera_output_df['Cam1_FrameName'], True)
-
-acquision_file_df = acquision_file_df.drop(['Cam1_FrameName'], axis=1)
-print(acquision_file_df.info())
-acquision_file_df.rename(columns={'Time [s]': 'TimeStamp'}, inplace=True)
-print(acquision_file_df.info())
-
-# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-#    print(camera_output_df)
-
-camera_output_file_name = synced_data_dir + '\SyncedCameraData_' + test_ID + '.csv'
 gleeble_output_file_name = synced_data_dir + '\SyncedGleebleData_' + test_ID + '.csv'
-acquision_file_name = synced_data_dir + '\MatchID_AcquisitionFile_' + test_ID + '.csv'
+matchID_file_name = synced_data_dir + '\MatchID_AcquisitionFile_' + test_ID + '.csv'
 
-camera_output_df.to_csv(camera_output_file_name)
-gleeble_copy_df.to_csv(gleeble_output_file_name)
-acquision_file_df.to_csv(acquision_file_name, index=False,
-                         sep=';')  # matchID needs a semi-colon deliminated file with the units in [], if there are no units, still include the []. First column: 'File', second column: 'TimeStamp', rest can be anything
+combined_df.to_csv(gleeble_output_file_name)
+matchID_df.to_csv(matchID_file_name, index=False, sep=';')
+#still need to conver the (unit) to [unit]
+# matchID needs a semi-colon deliminated file with the units in [], if there are no units, still include the [].
+# First column: 'File', second column: 'TimeStamp', rest can be anything
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+#
+# combined_file_name = synced_data_dir + '\combinedDF_' + test_ID + '.csv'
+# combined_df.to_csv(combined_file_name)
+#
+# for k in range(0, len(arduino_frame_df.axes[0])):
+#     frame_time = arduino_frame_df.iat[k, 10]
+#     try:
+#         lower_ind, upper_ind = find_neighbours(frame_time, gleeble_reordered_df, 'Time(msec)')
+#     except:
+#         print('Neighbour problem')
+#     #print(lower_ind, 'lowIND')
+#     lower_time = gleeble_reordered_df.iat[lower_ind, gleeble_index]
+#     upper_time = gleeble_reordered_df.iat[upper_ind, gleeble_index]
+#     average_ind = (upper_ind + lower_ind) / 2
+#     gleeble_reordered_df.loc[average_ind] = np.nan
+#     if (upper_time - lower_time) == 0:
+#         interpolate_ratio = 1
+#     else:
+#         interpolate_ratio = (frame_time - lower_time) / (upper_time - lower_time)
+#     gleeble_reordered_df.loc[average_ind, 'Time(msec)'] = frame_time
+#
+#     for j in range(0, number_of_col):
+#         lower_val = gleeble_reordered_df.iat[lower_ind[0], j]
+#         upper_val = gleeble_reordered_df.iat[upper_ind[0], j]
+#         interpolated_val = lower_val + (upper_val - lower_val) * interpolate_ratio
+#         #print(interpolated_val,'intVAL')
+#         if (j == number_of_col - 1):
+#             gleeble_reordered_df.loc[average_ind, 'FrameTriggered'] = 1
+#         else:
+#             gleeble_reordered_df.loc[average_ind, gleeble_reordered_df.iloc[:0, j].name] = interpolated_val
+#             #print(gleeble_reordered_df.loc[average_ind, gleeble_reordered_df.iloc[:0, j].name])
+#
+#     gleeble_reordered_df = gleeble_reordered_df.sort_index().reset_index(drop=True)
+#     #print(gleeble_reordered_df.info())
+#     #print(gleeble_reordered_df)
+#
+#
+# gleeble_copy_df = gleeble_copy_df.drop(['Time(ms)', 'quench4_diff'], axis=1)
+# gleeble_copy_df.columns = ['Time(s)', 'Quench4', 'Force(kN)', 'Jaw(mm)', 'Strain', 'Stress(MPa)', 'Stroke(mm)',
+#                            'Wedge(mm)', 'TC1', 'TC2', 'PTemp', 'FrameTriggered']
+# gleeble_copy_df['Time(s)'] = gleeble_copy_df['Time(s)'].div(1000)
+#
+# gleeble_copy_df.columns = ['Time [s]', 'Quench4 []', 'Force[kN]', 'Jaw[mm]', 'Strain []', 'Stress [MPa]', 'Stroke [mm]',
+#                            'Wedge [mm]', 'TC1 [C]', 'TC2 [C]', 'PTemp [C]', 'FrameTriggered []']
+#
+# camera_output_df = gleeble_copy_df[gleeble_copy_df['FrameTriggered []'].between(0.5, 1.5)]
+# camera_output_df = camera_output_df.sort_index().reset_index(drop=True)
+# camera_output_df = camera_output_df.drop(['FrameTriggered []'], axis=1)
+#
+# if (cam_1_path != 'EMPTY'):
+#     cam_1_df = pd.read_csv(cam_1_path, sep='\t', lineterminator='\n')
+#     camera_output_df['Cam1_FrameName'] = cam_1_df['Frame_Name']
+# if (cam_2_path != 'EMPTY'):
+#     cam_2_df = pd.read_csv(cam_2_path, sep='\t', lineterminator='\n')
+#     camera_output_df['Cam2_FrameName'] = cam_2_df['Frame_Name']
+# if (cam_3_path != 'EMPTY'):
+#     cam_3_df = pd.read_csv(cam_3_path, sep='\t', lineterminator='\n')
+#     camera_output_df['Cam3_FrameName'] = cam_3_df['Frame_Name']
+#
+# acquision_file_df = camera_output_df
+#
+# acquision_file_df.insert(0, 'File', camera_output_df['Cam1_FrameName'], True)
+#
+# acquision_file_df = acquision_file_df.drop(['Cam1_FrameName'], axis=1)
+# print(acquision_file_df.info())
+# acquision_file_df.rename(columns={'Time [s]': 'TimeStamp'}, inplace=True)
+# print(acquision_file_df.info())
+#
+# # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+# #    print(camera_output_df)
+#
+# camera_output_file_name = synced_data_dir + '\SyncedCameraData_' + test_ID + '.csv'
+# gleeble_output_file_name = synced_data_dir + '\SyncedGleebleData_' + test_ID + '.csv'
+# acquision_file_name = synced_data_dir + '\MatchID_AcquisitionFile_' + test_ID + '.csv'
+#
+# camera_output_df.to_csv(camera_output_file_name)
+# gleeble_copy_df.to_csv(gleeble_output_file_name)
+# acquision_file_df.to_csv(acquision_file_name, index=False,
+#                          sep=';')  # matchID needs a semi-colon deliminated file with the units in [], if there are no units, still include the []. First column: 'File', second column: 'TimeStamp', rest can be anything

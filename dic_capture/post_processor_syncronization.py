@@ -257,32 +257,85 @@ if show_force_plot:
     plt.show()
 
 # interpolate frame data into gleeble data
+arduino_frame_df['Time(msec)'] = arduino_frame_df['GleebleTime(msec)']
+combined_df = pd.concat([gleeble_reordered_df, arduino_frame_df], ignore_index=True, sort=False)
 
-print(arduino_frame_df.info())
+combined_df = combined_df.sort_values(by=['Time(msec)'], ignore_index=True, ascending=True)
+print(combined_df.info())
+
+
+
+number_of_col = len(gleeble_reordered_df.axes[1])
+col_name = 'trigger_frame_count'
+combined_index = combined_df.columns.get_loc(col_name)
+combined_number_of_rows = len(combined_df.axes[0])
+
+for k in range(0, combined_number_of_rows):
+    # definitly not the fastst code but it gets the job done
+    if combined_df.isnull().iloc[k, 0]:
+        # find the closest previous data row
+        k_previous = k - 1
+        while combined_df.isnull().iloc[k_previous, 0]:
+            k_previous = k_previous - 1
+        # find the closest next data row
+        k_next = k + 1
+        while combined_df.isnull().iloc[k_next, 0]:
+            k_next = k_next + 1
+        # interpolate between these two rows for every column that came from the gleeble_reordered_df (we dont want
+        # to interpolate the data that came from the arduino_frame_df as it'll just make the data harder to read)
+
+        previous_time = combined_df.iloc[k_previous, 1]
+        next_time = combined_df.iloc[k_next, 1]
+        current_time = combined_df.iloc[k, 1]
+
+        interpolate_ratio = (current_time - previous_time) / (next_time - previous_time)
+        interpolated_val_time = (previous_time + (next_time - previous_time) * interpolate_ratio)/1000
+        combined_df.iloc[k, 0] = interpolated_val_time
+
+        for j in range(2, number_of_col):
+            prev_value = combined_df.iloc[k_previous, j]
+            next_value = combined_df.iloc[k_next, j]
+            interpolated_val = prev_value + (next_value - prev_value) * interpolate_ratio
+            combined_df.iloc[k, j] = interpolated_val
+
+        print('Frame Number:', round(combined_df.iloc[k, combined_index]))
+
+
+combined_file_name = synced_data_dir + '\combinedDF_' + test_ID + '.csv'
+combined_df.to_csv(combined_file_name)
+
 for k in range(0, len(arduino_frame_df.axes[0])):
     frame_time = arduino_frame_df.iat[k, 10]
     try:
         lower_ind, upper_ind = find_neighbours(frame_time, gleeble_reordered_df, 'Time(msec)')
     except:
         print('Neighbour problem')
-    lower_time = gleeble_reordered_df.iat[lower_ind, col_loc('Time(msec)')]
-    upper_time = gleeble_reordered_df.iat[upper_ind, col_loc('Time(msec)')]
+    #print(lower_ind, 'lowIND')
+    lower_time = gleeble_reordered_df.iat[lower_ind, gleeble_index]
+    upper_time = gleeble_reordered_df.iat[upper_ind, gleeble_index]
     average_ind = (upper_ind + lower_ind) / 2
-    gleeble_copy_df.loc[average_ind] = np.nan
+    gleeble_reordered_df.loc[average_ind] = np.nan
+    if (upper_time - lower_time) ==0:
+        interpolate_ratio = 1
+    else:
+        interpolate_ratio = (frame_time - lower_time) / (upper_time - lower_time)
+    gleeble_reordered_df.loc[average_ind, 'Time(msec)'] = frame_time
 
-    interpolate_ratio = (frame_time - lower_time) / (upper_time - lower_time)
-    gleeble_copy_df.loc[average_ind, 'Time'] = frame_time
-
-    for k in range(1, number_of_col):
-        lower_val = gleeble_copy_df.iat[lower_ind, k]
-        upper_val = gleeble_copy_df.iat[upper_ind, k]
+    for j in range(0, number_of_col):
+        lower_val = gleeble_reordered_df.iat[lower_ind[0], j]
+        upper_val = gleeble_reordered_df.iat[upper_ind[0], j]
         interpolated_val = lower_val + (upper_val - lower_val) * interpolate_ratio
-        if (k == number_of_col - 1):
-            gleeble_copy_df.loc[average_ind, column_names_list[k]] = 1
+        #print(interpolated_val,'intVAL')
+        if (j == number_of_col - 1):
+            gleeble_reordered_df.loc[average_ind, 'FrameTriggered'] = 1
         else:
-            gleeble_copy_df.loc[average_ind, column_names_list[k]] = interpolated_val
+            gleeble_reordered_df.loc[average_ind, gleeble_reordered_df.iloc[:0, j].name] = interpolated_val
+            #print(gleeble_reordered_df.loc[average_ind, gleeble_reordered_df.iloc[:0, j].name])
 
-    gleeble_copy_df = gleeble_copy_df.sort_index().reset_index(drop=True)
+    gleeble_reordered_df = gleeble_reordered_df.sort_index().reset_index(drop=True)
+    #print(gleeble_reordered_df.info())
+    #print(gleeble_reordered_df)
+
 
 gleeble_copy_df = gleeble_copy_df.drop(['Time(ms)', 'quench4_diff'], axis=1)
 gleeble_copy_df.columns = ['Time(s)', 'Quench4', 'Force(kN)', 'Jaw(mm)', 'Strain', 'Stress(MPa)', 'Stroke(mm)',

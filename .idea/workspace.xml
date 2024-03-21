@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Started working on plotting the ADC channels, Next want to overlay when it was a frame trigger vs adc read">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="graph is working. added a constant offset. working on output files now">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
     </list>
@@ -545,7 +545,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711020917583</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="graph is working. added a constant offset. working on output files now">
+      <option name="closed" value="true" />
+      <created>1711032254885</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1711032254885</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -560,7 +568,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Managed to get the cameras working and close the GUI after clicking the test run button" />
     <MESSAGE value="Used multithreading for the frame processing and took the cv.show into a seperate function. Display speed seems much beter" />
     <MESSAGE value="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time" />
     <MESSAGE value="Removed camera 3 from GUI for now. Will re-visit adding more camera capabilities but outside the scope of this project. For now, cameras can be connected to other cameras and triggered by the arduino (like is done with the thermal camera)" />
@@ -585,6 +592,7 @@
     <MESSAGE value="Almost there, have the differences quantified. Seems to be around a 50ms offset?" />
     <MESSAGE value="House keeping and added some comments" />
     <MESSAGE value="Started working on plotting the ADC channels, Next want to overlay when it was a frame trigger vs adc read" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started working on plotting the ADC channels, Next want to overlay when it was a frame trigger vs adc read" />
+    <MESSAGE value="graph is working. added a constant offset. working on output files now" />
+    <option name="LAST_COMMIT_MESSAGE" value="graph is working. added a constant offset. working on output files now" />
   </component>
 </project>

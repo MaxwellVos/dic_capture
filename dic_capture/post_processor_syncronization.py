@@ -8,6 +8,11 @@ import numpy as np
 import shutil
 import matplotlib.pyplot as plt
 
+# offset_constant is derived emperically, there seems to be a delay from starting the gleeble zeroing the sysTime and
+# sampleStart. For now, it is easiest to adjust the offset constant so that the graphs line up perfectly (this offset
+# constant should be between 0 and 200ms normally)
+offset_constant = 113 #ms
+
 # first set up adc channels and set names. Polynomial conversions may be added later so this is kept basic for now.
 adc1_name = 'adc1'
 adc1_mul_constant = 1
@@ -21,9 +26,11 @@ adc3_name = 'adc3'
 adc3_mul_constant = 1
 adc3_offset_constant = 0
 
-adc4_name = 'Force(kN)'
+adc4_name = 'ADC_Force(kN)'
 adc4_mul_constant = 20 # +-10V on a +-200kN loadcell
 adc4_offset_constant = 0
+
+show_force_plot = False
 
 def find_neighbours(value, df, colname):
     exactmatch = df[df[colname] == value]
@@ -154,7 +161,7 @@ DIC_trig_times_df.insert(1,
                          arduino_fps_change_times,
                          True)
 
-zero_offset = DIC_trig_times_df['GleebleTrigTime(msec)'].min()
+zero_offset = DIC_trig_times_df['GleebleTrigTime(msec)'].min() + offset_constant
 
 DIC_trig_times_df['ArduinoTrigTimes(msec)'] = (DIC_trig_times_df['ArduinoTrigTimes(msec)']
                                                .add(zero_offset))
@@ -179,7 +186,7 @@ Trigger_file_name = synced_data_dir + '\Trigger_Timing_Differences_' + test_ID +
 DIC_trig_times_df.to_csv(Trigger_file_name)
 
 max_timing_diff = DIC_trig_times_df['Difference(msec)'].abs().max()
-if max_timing_diff > 100:
+if (max_timing_diff-offset_constant) > 100:
     print('Largest timing difference is', max_timing_diff,
           'msec which is greater than the threshold of 100msec and the data should therefore be checked.')
 
@@ -198,24 +205,68 @@ arduino_df[adc3_name] = (arduino_df['adc.ch3_volts']
 arduino_df[adc4_name] = (arduino_df['adc.ch4_volts']
                          .mul(adc4_mul_constant)
                          .add(adc4_offset_constant))
-print(arduino_df)
+#print(arduino_df)
+#print(arduino_df.info())
 
-x1 = arduino_df['GleebleTime(msec)']
-y1 = arduino_df[adc4_name]
-plt.scatter(x1,y1)
-plt.plot(x1,y1)
-plt.show()
+arduino_frame_count_past = -1
+arduino_frame_df = pd.DataFrame()
+# build a df which only holds the data assosiated with an image
+for k in range(0, len(arduino_df.axes[0])):
+    arduino_frame_count_current = arduino_df.iat[k, 0]
 
-///////////////////////////////
+    if arduino_frame_count_current != arduino_frame_count_past:
+        arduino_frame_df = arduino_frame_df._append(arduino_df.loc[k, :],
+                                                      ignore_index=True)
+    arduino_frame_count_past = arduino_frame_count_current
 
-for k in range(0, output_len):
-    frame_time = frame_time_df.iat[k, 1]
+if show_force_plot:
+    x1 = arduino_df['GleebleTime(msec)']
+    x2 = arduino_frame_df['GleebleTime(msec)']
+    x3 = gleeble_reordered_df['Time(msec)']
+    y1 = arduino_df[adc4_name]
+    y2 = arduino_frame_df[adc4_name]
+    y3 = gleeble_reordered_df['Force(kN)']
+
+    plt.plot(x=x1,
+             y=y1,
+             linewidth=1)
+
+    plt.scatter(x=x1,
+                y=y1,
+                color='blue',
+                s=20,
+                label="ADC subsampling")
+
+    plt.scatter(x=x2,
+                y=y2,
+                color='red',
+                s=20,
+                label="DIC Frame")
+
+    plt.scatter(x=x3,
+                y=y3,
+                color='black',
+                s=20,
+                label="Gleeble Data")
+
+    title = "Comparison of DIC and Gleeble data for testID: " + test_ID
+    plt.title(title)
+    plt.xlabel('Time(msec)')
+    plt.ylabel('Force (kN)')
+    plt.legend(loc='lower right')
+    plt.show()
+
+# interpolate frame data into gleeble data
+
+print(arduino_frame_df.info())
+for k in range(0, len(arduino_frame_df.axes[0])):
+    frame_time = arduino_frame_df.iat[k, 10]
     try:
-        lower_ind, upper_ind = find_neighbours(frame_time, gleeble_copy_df, 'Time(ms)')
+        lower_ind, upper_ind = find_neighbours(frame_time, gleeble_reordered_df, 'Time(msec)')
     except:
         print('Neighbour problem')
-    lower_time = gleeble_copy_df.iat[lower_ind, col_loc('Time(ms)')]
-    upper_time = gleeble_copy_df.iat[upper_ind, col_loc('Time(ms)')]
+    lower_time = gleeble_reordered_df.iat[lower_ind, col_loc('Time(msec)')]
+    upper_time = gleeble_reordered_df.iat[upper_ind, col_loc('Time(msec)')]
     average_ind = (upper_ind + lower_ind) / 2
     gleeble_copy_df.loc[average_ind] = np.nan
 

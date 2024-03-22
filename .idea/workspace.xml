@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="interpolating is now working. Scrapped the old method, it was trash">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
     </list>
@@ -54,26 +54,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.DIC_Capture.executor": "Run",
-    "Python.Temp.executor": "Run",
-    "Python.USB test.executor": "Run",
-    "Python.gui.executor": "Run",
-    "Python.post_processor_syncronization.executor": "Run",
-    "Python.run.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "test-single-array-saving",
-    "last_opened_file_path": "C:/Users/maxwe/PycharmProjects/dic_capture/dic_capture",
-    "settings.editor.selected.configurable": "inlay.hints"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.DIC_Capture.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Temp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.USB test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.post_processor_syncronization.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;test-single-array-saving&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/maxwe/PycharmProjects/dic_capture/dic_capture&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\maxwe\PycharmProjects\dic_capture\dic_capture" />
@@ -561,7 +561,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711043572287</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID">
+      <option name="closed" value="true" />
+      <created>1711047749218</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1711047749218</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -576,7 +584,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed the zoom and histogram. Tried to make it faster with multithreading but ran into sync issues. The zoom rectangle and histogram would be buggy. Around 7fps with both cameras, zoom and histograms. Maybe could get it right with the propper flagging and some time" />
     <MESSAGE value="Removed camera 3 from GUI for now. Will re-visit adding more camera capabilities but outside the scope of this project. For now, cameras can be connected to other cameras and triggered by the arduino (like is done with the thermal camera)" />
     <MESSAGE value="got rid of the video show class that isnt necissary" />
     <MESSAGE value="Got rid of some legacy methods that werent being used anymore. Still to do: add button for cameraless operation." />
@@ -601,6 +608,7 @@
     <MESSAGE value="Started working on plotting the ADC channels, Next want to overlay when it was a frame trigger vs adc read" />
     <MESSAGE value="graph is working. added a constant offset. working on output files now" />
     <MESSAGE value="interpolating is now working. Scrapped the old method, it was trash" />
-    <option name="LAST_COMMIT_MESSAGE" value="interpolating is now working. Scrapped the old method, it was trash" />
+    <MESSAGE value="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID" />
+    <option name="LAST_COMMIT_MESSAGE" value="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID" />
   </component>
 </project>

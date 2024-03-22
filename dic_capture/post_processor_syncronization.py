@@ -14,23 +14,23 @@ import matplotlib.pyplot as plt
 offset_constant = 113 #ms
 
 # first set up adc channels and set names. Polynomial conversions may be added later so this is kept basic for now.
-adc1_name = 'adc1'
+adc1_name = 'adc1 [V]'
 adc1_mul_constant = 1
 adc1_offset_constant = 0
 
-adc2_name = 'adc2'
+adc2_name = 'adc2 [V]'
 adc2_mul_constant = 1
 adc2_offset_constant = 0
 
-adc3_name = 'adc3'
+adc3_name = 'adc3 [V]'
 adc3_mul_constant = 1
 adc3_offset_constant = 0
 
-adc4_name = 'ADC_Force(kN)'
+adc4_name = 'ADC_Force [kN]'
 adc4_mul_constant = 20 # +-10V on a +-200kN loadcell
 adc4_offset_constant = 0
 
-show_force_plot = False
+show_force_plot = True
 
 def find_neighbours(value, df, colname):
     exactmatch = df[df[colname] == value]
@@ -99,24 +99,31 @@ gleeble_df = gleeble_df.drop([0])
 gleeble_reordered_df = pd.DataFrame()
 
 # concat unit to time variable
-time_name = 'Time' + gleeble_units_df[gleeble_df.iloc[:0, 0].name]
+time_name = 'Time [sec]' #+ gleeble_units_df[gleeble_df.iloc[:0, 0].name]
 gleeble_reordered_df[time_name] = gleeble_df[gleeble_df.iloc[:0, 0].name].astype(float)
 # all calculations done in milliseconds in this program
-gleeble_reordered_df['Time(msec)'] = gleeble_reordered_df[time_name].mul(1000)
+gleeble_reordered_df['Time [msec]'] = gleeble_reordered_df[time_name].mul(1000)
 
-# pull in all variable names and concat the relevant unit.
+# pull in all variable names and concat the relevant unit with [] instead of () to be compatible with MatchID.
 for k in range(1, len(gleeble_df.axes[1])):
     parameter = gleeble_df.iloc[:0, k].name
-    unit = gleeble_units_df[gleeble_df.iloc[:0, k].name]
-    parameter_unit = str(parameter) + str(unit)
+    unit = str(gleeble_units_df[gleeble_df.iloc[:0, k].name])
+    if unit == 'nan':
+        unit = ''
+    unit = unit.replace("(", "")
+    unit = unit.replace(")", "")
+    unit = '['+unit+']'
+
+    parameter_unit = str(parameter) + ' ' + str(unit)
     gleeble_reordered_df[parameter_unit] = gleeble_df.iloc[:, k].astype(float)
 
 # seems backwards to have to find the DIC.trigger index like this; but I can't find a more elegant syntax.
-col_name = 'DIC.trigger(lbloo)'
+col_name = 'DIC.trigger [lbloo]'
 DIC_index = gleeble_reordered_df.columns.get_loc(col_name)
+print(gleeble_reordered_df.info())
 
 # making a df with the rising edge times of the Gleeble DIC.trigger variable
-DIC_trig_times_df = pd.DataFrame(columns=['GleebleTrigTime(msec)'])
+DIC_trig_times_df = pd.DataFrame(columns=['GleebleTrigTime [msec]'])
 DIC_trig_prev = 0
 
 for k in range(0, len(gleeble_reordered_df.axes[0])):
@@ -125,10 +132,13 @@ for k in range(0, len(gleeble_reordered_df.axes[0])):
     # is some form of software averaging to the DIC.trigger signal which averages the step signal over 100ms. It was
     # determined that finding the zero intersect of a line of best fit contributed insignificantly to timing accuracy
     # so the first non-zero value was used instead. This should be more robust if Gleeble removes this averaging
-    # function in the future.
+    # function in the future. There may be a workaround for people who have the DIC module by connecting the DIC.trigger
+    # out to the DIC.in and recording that instead of the DIC.trigger. It should give a more responsive reading, however
+    # this requires the purchase of the DIC module. For most cases the current setup should be fine and can be connected
+    # to quench 3 or 4 which all gleeble customers have.
     if (DIC_trig_current > 0) and (DIC_trig_prev == 0):
         print(gleeble_reordered_df.iat[k, 1])
-        DIC_trig_times_df = DIC_trig_times_df._append({'GleebleTrigTime(msec)': gleeble_reordered_df.iat[k, 1]},
+        DIC_trig_times_df = DIC_trig_times_df._append({'GleebleTrigTime [msec]': gleeble_reordered_df.iat[k, 1]},
                                                       ignore_index=True)
     DIC_trig_prev = DIC_trig_current
 
@@ -138,16 +148,16 @@ DIC_trig_times_df.drop(index=DIC_trig_times_df.index[-1],
 
 print(DIC_trig_times_df)
 
-arduino_df.columns = ['trigger_frame_count',
-                      'adc_frame_count',
-                      'test_run_time',
-                      'fps_change_count',
-                      'fps_change_time',
-                      'adc.ch1_volts',
-                      'adc.ch2_volts',
-                      'adc.ch3_volts',
-                      'adc.ch4_volts',
-                      'data_delta']
+arduino_df.columns = ['trigger_frame_count []',
+                      'adc_frame_count []',
+                      'test_run_time [msec]',
+                      'fps_change_count []',
+                      'fps_change_time [msec]',
+                      'adc.ch1_volts [V]',
+                      'adc.ch2_volts [V]',
+                      'adc.ch3_volts [V]',
+                      'adc.ch4_volts [V]',
+                      'data_delta []']
 
 arduino_quench_times_df = arduino_df.iloc[:, 4]
 # The exact time of the last trigger signal is recorded in each row. This isn't very efficient; but, we had the
@@ -157,20 +167,20 @@ arduino_fps_change_times = arduino_quench_times_df.unique()
 print(arduino_fps_change_times)
 
 DIC_trig_times_df.insert(1,
-                         'ArduinoTrigTimes(msec)',
+                         'ArduinoTrigTimes [msec]',
                          arduino_fps_change_times,
                          True)
 
-zero_offset = DIC_trig_times_df['GleebleTrigTime(msec)'].min() + offset_constant
+zero_offset = DIC_trig_times_df['GleebleTrigTime [msec]'].min() + offset_constant
 
-DIC_trig_times_df['ArduinoTrigTimes(msec)'] = (DIC_trig_times_df['ArduinoTrigTimes(msec)']
+DIC_trig_times_df['ArduinoTrigTimes [msec]'] = (DIC_trig_times_df['ArduinoTrigTimes [msec]']
                                                .add(zero_offset))
 
-arduino_df['GleebleTime(msec)'] = arduino_df['test_run_time'].add(zero_offset)
+arduino_df['GleebleTime [msec]'] = arduino_df['test_run_time [msec]'].add(zero_offset)
 
 
-DIC_trig_times_df['Difference(msec)'] = (DIC_trig_times_df['GleebleTrigTime(msec)']
-                                         .sub(DIC_trig_times_df['ArduinoTrigTimes(msec)'])
+DIC_trig_times_df['Difference [msec]'] = (DIC_trig_times_df['GleebleTrigTime [msec]']
+                                         .sub(DIC_trig_times_df['ArduinoTrigTimes [msec]'])
                                          .round(2))
 
 print(DIC_trig_times_df)
@@ -185,24 +195,24 @@ print(DIC_trig_times_df)
 Trigger_file_name = synced_data_dir + '\Trigger_Timing_Differences_' + test_ID + '.csv'
 DIC_trig_times_df.to_csv(Trigger_file_name)
 
-max_timing_diff = DIC_trig_times_df['Difference(msec)'].abs().max()
+max_timing_diff = DIC_trig_times_df['Difference [msec]'].abs().max()
 if (max_timing_diff-offset_constant) > 100:
     print('Largest timing difference is', max_timing_diff,
           'msec which is greater than the threshold of 100msec and the data should therefore be checked.')
 
-arduino_df[adc1_name] = (arduino_df['adc.ch1_volts']
+arduino_df[adc1_name] = (arduino_df['adc.ch1_volts [V]']
                          .mul(adc1_mul_constant)
                          .add(adc1_offset_constant))
 
-arduino_df[adc2_name] = (arduino_df['adc.ch2_volts']
+arduino_df[adc2_name] = (arduino_df['adc.ch2_volts [V]']
                          .mul(adc2_mul_constant)
                          .add(adc2_offset_constant))
 
-arduino_df[adc3_name] = (arduino_df['adc.ch3_volts']
+arduino_df[adc3_name] = (arduino_df['adc.ch3_volts [V]']
                          .mul(adc3_mul_constant)
                          .add(adc3_offset_constant))
 
-arduino_df[adc4_name] = (arduino_df['adc.ch4_volts']
+arduino_df[adc4_name] = (arduino_df['adc.ch4_volts [V]']
                          .mul(adc4_mul_constant)
                          .add(adc4_offset_constant))
 #print(arduino_df)
@@ -220,15 +230,18 @@ for k in range(0, len(arduino_df.axes[0])):
     arduino_frame_count_past = arduino_frame_count_current
 
 if show_force_plot:
-    x1 = arduino_df['GleebleTime(msec)']
-    x2 = arduino_frame_df['GleebleTime(msec)']
-    x3 = gleeble_reordered_df['Time(msec)']
+    x1 = arduino_df['GleebleTime [msec]']
+    print('----------------',x1)
+    print('mmmmmmmmmmmmmmmmmmmm')
+    print(arduino_df['GleebleTime [msec]'].info())
+    x2 = arduino_frame_df['GleebleTime [msec]']
+    x3 = gleeble_reordered_df['Time [msec]']
     y1 = arduino_df[adc4_name]
     y2 = arduino_frame_df[adc4_name]
-    y3 = gleeble_reordered_df['Force(kN)']
+    y3 = gleeble_reordered_df['Force [kN]']
 
-    plt.plot(x=x1,
-             y=y1,
+    plt.plot(arduino_df['GleebleTime [msec]'],
+             y1,
              linewidth=1)
 
     plt.scatter(x=x1,
@@ -251,18 +264,17 @@ if show_force_plot:
 
     title = "Comparison of DIC and Gleeble data for testID: " + test_ID
     plt.title(title)
-    plt.xlabel('Time(msec)')
-    plt.ylabel('Force (kN)')
+    plt.xlabel('Time [msec]')
+    plt.ylabel('Force [kN]')
     plt.legend(loc='lower right')
     plt.show()
 
-
 # create a common column of Time(msec) so that the df concat doesnt merge rows
-arduino_frame_df['Time(msec)'] = arduino_frame_df['GleebleTime(msec)']
+arduino_frame_df['Time [msec]'] = arduino_frame_df['GleebleTime [msec]']
 combined_df = pd.concat([gleeble_reordered_df, arduino_frame_df], ignore_index=True, sort=False)
-combined_df = combined_df.sort_values(by=['Time(msec)'], ignore_index=True, ascending=True)
+combined_df = combined_df.sort_values(by=['Time [msec]'], ignore_index=True, ascending=True)
 number_of_col = len(gleeble_reordered_df.axes[1])
-col_name = 'trigger_frame_count'
+col_name = 'trigger_frame_count []'
 combined_index = combined_df.columns.get_loc(col_name)
 combined_number_of_rows = len(combined_df.axes[0])
 matchID_df = pd.DataFrame()
@@ -310,8 +322,17 @@ if (cam_1_path != 'EMPTY'):
     matchID_df.insert(0, 'File', frame_name_from_cam_df['Frame_Name'], True)
 
 #
-matchID_df = matchID_df.drop(['Time(msec)'], axis=1)
-combined_df = combined_df.drop(['Time(msec)'], axis=1)
+matchID_df = matchID_df.drop(['Time [msec]'], axis=1)
+matchID_df = matchID_df.drop(['GleebleTime [msec]'], axis=1)
+matchID_df = matchID_df.drop(['data_delta []'], axis=1)
+matchID_df = matchID_df.drop(['fps_change_time [msec]'], axis=1)
+matchID_df = matchID_df.drop(['adc_frame_count []'], axis=1)
+combined_df = combined_df.drop(['Time [msec]'], axis=1)
+combined_df = combined_df.drop(['GleebleTime [msec]'], axis=1)
+
+matchID_df['Force [kN]'] = matchID_df['Force [kN]'].round(-3)
+
+
 
 gleeble_output_file_name = synced_data_dir + '\SyncedGleebleData_' + test_ID + '.csv'
 matchID_file_name = synced_data_dir + '\MatchID_AcquisitionFile_' + test_ID + '.csv'

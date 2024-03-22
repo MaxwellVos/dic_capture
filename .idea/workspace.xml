@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="it all seems to be working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
     </list>
@@ -569,7 +569,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711047749218</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="it all seems to be working">
+      <option name="closed" value="true" />
+      <created>1711102719104</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1711102719104</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -584,7 +592,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Removed camera 3 from GUI for now. Will re-visit adding more camera capabilities but outside the scope of this project. For now, cameras can be connected to other cameras and triggered by the arduino (like is done with the thermal camera)" />
     <MESSAGE value="got rid of the video show class that isnt necissary" />
     <MESSAGE value="Got rid of some legacy methods that werent being used anymore. Still to do: add button for cameraless operation." />
     <MESSAGE value="Added funtion to change exposure time live using arrow keys" />
@@ -609,6 +616,7 @@
     <MESSAGE value="graph is working. added a constant offset. working on output files now" />
     <MESSAGE value="interpolating is now working. Scrapped the old method, it was trash" />
     <MESSAGE value="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID" />
-    <option name="LAST_COMMIT_MESSAGE" value="seems to all be working. Just need to replace the () with [] for units to make compatable with matchID" />
+    <MESSAGE value="it all seems to be working" />
+    <option name="LAST_COMMIT_MESSAGE" value="it all seems to be working" />
   </component>
 </project>

@@ -40,6 +40,7 @@ cam_1_path = 'EMPTY'
 cam_2_path = 'EMPTY'
 cam_3_path = 'EMPTY'
 gleeble_path = 'EMPTY'
+arduino_path = 'EMPTY'
 
 test_folder_dir = easygui.diropenbox(
     default='C:/Users/maxwe/OneDrive/Documents/Masters/Test_Data/Sync Data V3/Nkopo_2024_026',
@@ -52,7 +53,7 @@ test_ID = os.path.basename(os.path.normpath(test_folder_dir))
 print('Test ID: ', test_ID)
 
 gleeble_drop_dir = 'C:/Users/maxwe/OneDrive - University of Cape Town/GleebleDropFromControl/'
-arduino_path = ''
+
 
 for k in range(0, len(files_in_dir)):
     if '.d0' in files_in_dir[k]:

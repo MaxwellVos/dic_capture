@@ -41,7 +41,7 @@ DIC_image_shape = np.array([image_height, image_width])  # HEIGHT, WIDTH
 
 
 test_folder_dir = easygui.diropenbox(
-    default='C:/Users/maxwe/OneDrive/Documents/Masters/Test_Data/Sync Data V3/Nkopo_2024_Calibration_005',
+    default='C:/Users/maxwe/OneDrive/Documents/Masters/Test_Data',
     title='The test_data folder for the test. It should be the same as the TEST ID')
 
 output_match_ID_file = os.path.join(test_folder_dir, "Camera_3_Thermal_MatchID")
@@ -75,35 +75,32 @@ for filename in os.listdir(input_file):
     img_save_count = img_save_count + 1
 
     import_image = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
-    divide_arr = DIC_image_shape / np.shape(import_image)
+    #avg_val = np.average(import_image)
+    #max_val = np.max(import_image)
+    #min_val = np.min(import_image)
+    #normalized_img = ((import_image - min_val) / (max_val - min_val))*255
+    #normalized_img = normalized_img.astype(np.uint8)
 
-    output_size = np.round(np.array(np.shape(import_image)) * np.min(divide_arr))
-    resize_height = int(output_size[0])
-    resize_width = int(output_size[1])
-    max_val = np.max(import_image)
-    min_val = np.min(import_image)
-    normalized_img = ((import_image - min_val) / (max_val - min_val))*255
+    pts1 = np.float32([[238, 211], [324, 211],
+                       [244, 398], [330, 395]])
+    pts2 = np.float32([[0, 0], [200, 0],
+                       [0, 600], [200, 600]])
+    size = (200, 600)
 
+    M = cv2.getPerspectiveTransform(pts1, pts2)
+    corrected_img = cv2.warpPerspective(import_image, M, size)
+    avg_val = np.mean(corrected_img)
 
+    max_val = np.max(corrected_img)
+    min_val = np.min(corrected_img)
+    print(avg_val, max_val, min_val)
+    set_range_img = ((corrected_img - avg_val)*3.5 + 128)
+    corrected_img = set_range_img.astype(np.uint8)
+    heat_img = cv2.applyColorMap(corrected_img, cv2.COLORMAP_TURBO)
+    #note from past Max: need to emmisivity correct the perspective region first then show the variation with an absolute scale (maybe +-50C). I think the perspective warp converts the  image into UINT8 format so this should only be done last.
 
-    resized_img = cv2.resize(import_image, (resize_width, resize_height), interpolation=cv2.INTER_LINEAR)
-    resized_normalized_img = cv2.resize(normalized_img, (resize_width, resize_height), interpolation=cv2.INTER_LINEAR)
-    resized_normalized_img = resized_normalized_img.astype(np.uint8)
-
-    if resize_height < DIC_image_shape[0]:
-        boarder_size = int(DIC_image_shape[0] - resize_height)
-        boarder_img = cv2.copyMakeBorder(resized_img, 0, boarder_size, 0, 0, cv2.BORDER_CONSTANT, value=0)
-        resized_normalized_img = cv2.copyMakeBorder(resized_normalized_img, 0, boarder_size, 0, 0, cv2.BORDER_CONSTANT, value=0)
-    if resize_width < DIC_image_shape[1]:
-        boarder_size = int(DIC_image_shape[1] - resize_width)
-        boarder_img = cv2.copyMakeBorder(resized_img, 0, 0, 0, boarder_size, cv2.BORDER_CONSTANT, value=0)
-        resized_normalized_img = cv2.copyMakeBorder(resized_normalized_img, 0, 0, 0, boarder_size, cv2.BORDER_CONSTANT,
-                                                    value=0)
-
-    resized_img = np.round(boarder_img)
-    print(np.max(boarder_img))
     np.savetxt(output_match_ID_path,
-               boarder_img,
+               corrected_img,
                fmt='%1.0f',
                delimiter=';',
                newline='\n',
@@ -115,6 +112,7 @@ for filename in os.listdir(input_file):
     #print(np.shape(resized_normalized_img))
     #resized_normalized_img = cv2.cvtColor(resized_normalized_img, cv2.COLOR_GRAY2RGB)
     #print(np.shape(resized_normalized_img))
-    #cv2.imwrite(output_image_path, resized_normalized_img)
-    tf.imwrite(output_image_path, resized_normalized_img, photometric='miniswhite')
+
+    cv2.imwrite(output_image_path, heat_img)
+    #tf.imwrite(output_image_path, corrected_img, photometric='minisblack')
     print('Saved:', output_image_path)

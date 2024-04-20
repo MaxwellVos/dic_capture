@@ -51,7 +51,6 @@ def timer_func(func):
 
 def run(config: Dict[str, Any]):
 
-
     """Run the DIC Capture software with the given config file path and record mode.
     
     Example config file:

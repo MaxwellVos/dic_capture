@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Got the conversion formatting correct (iI believe)&#10;Just have to get the file organising and renaming process to work.">
-      <change afterPath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" afterDir="false" />
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/test/telops_to_matchid_reformat.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/test/telops_to_matchid_reformat.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,10 +200,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.PSC heating paper" />
+        <item itemvalue="Python.post_processor_syncronization" />
         <item itemvalue="Python.gui" />
         <item itemvalue="Python.Demo" />
         <item itemvalue="Python.telops_to_matchid_reformat" />
-        <item itemvalue="Python.post_processor_syncronization" />
       </list>
     </recent_temporary>
   </component>
@@ -599,7 +599,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711375454959</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay">
+      <option name="closed" value="true" />
+      <created>1713608863600</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1713608863600</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -614,7 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added funtion to change exposure time live using arrow keys" />
     <MESSAGE value="formatting stuff" />
     <MESSAGE value="kind of getting the super save array to work. lots more to do" />
     <MESSAGE value="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out." />
@@ -639,6 +646,7 @@
     <MESSAGE value="it all seems to be working" />
     <MESSAGE value="Neatened things up" />
     <MESSAGE value="Got the conversion formatting correct (iI believe)&#10;Just have to get the file organising and renaming process to work." />
-    <option name="LAST_COMMIT_MESSAGE" value="Got the conversion formatting correct (iI believe)&#10;Just have to get the file organising and renaming process to work." />
+    <MESSAGE value="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay" />
+    <option name="LAST_COMMIT_MESSAGE" value="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay" />
   </component>
 </project>

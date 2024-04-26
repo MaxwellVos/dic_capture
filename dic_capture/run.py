@@ -203,7 +203,7 @@ def run(config: Dict[str, Any]):
             except Exception as e:
                 #logging.error(f'Error reading serial output from Arduino in second block: {e}')
                 print('serial output error in second block')
-                break
+                #break
         qValue_decode_sum = ''
         event = threading.Event()
         while record_mode == False:

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # offset_constant is derived empirically, there seems to be a delay from starting the gleeble zeroing the sysTime and
 # sampleStart. For now, it is easiest to adjust the offset constant so that the graphs line up perfectly (this offset
 # constant should be between 0 and 200ms normally)
-offset_constant = 113  # ms
+offset_constant = 15  # ms
 
 # first set up adc channels and set names. Polynomial conversions may be added later so this is kept basic for now.
 adc1_name = 'adc1 [V]'

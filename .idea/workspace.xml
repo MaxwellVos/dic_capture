@@ -7,8 +7,6 @@
     <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/post_processor_syncronization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dic_capture/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -607,7 +605,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713608863600</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay">
+      <option name="closed" value="true" />
+      <created>1714117924460</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1714117924460</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -10,6 +10,7 @@ import numpy as np
 import shutil
 import tifffile as tf
 import threading
+
 def plt_show_sec(duration: float = 3):
     def _stop():
         time.sleep(duration)
@@ -20,8 +21,23 @@ def plt_show_sec(duration: float = 3):
     plt.pause(duration)
 
 
+material = 'EN8'
+full_range_temperature = 100
+offset = -30 #temperature offset to make image more readable
 
-full_range_temperature = 125
+figure, axis = plt.subplots(2, 5)
+
+#custom_xlim = (0, 100)
+custom_ylim = (-20, 20)
+plt.setp(axis, ylim=custom_ylim)
+
+
+n_lines = 12
+color_count = 0
+cmap = plt.colormaps['viridis']
+# Take colors at regular intervals spanning the colormap.
+colors = cmap(np.linspace(0, 1, n_lines))
+temperature_list = ['200C','350C','500C','700C','950C']
 
 
 # Thermal images are resized to be the same as the DIC images to avoid scaling issues.
@@ -105,9 +121,33 @@ except:
 prev_check_ID = 0
 files_in_dir = os.listdir(input_file)
 img_save_count = 0
+q3_count = -1
+q3_current = 0
+q3_past = 0
+y_axis_count = 0
+q3_inc = 1
+step = 0
+timeStamp_past = 0
+timeStamp_current = 0
 
 for filename in os.listdir(input_file):
     temp_img_df = synced_master_df.iloc[img_save_count]
+    q3_current = temp_img_df['Quench3 [lbloo]']
+    timeStamp_current = temp_img_df['TimeStamp']
+    jaw = temp_img_df['Jaw [mm]']
+    if (q3_current > 0) and (q3_past == 0):
+        step = step + 1
+        color_change_flag = True
+        q3_count = q3_count + q3_inc
+        if q3_count == 4:
+            q3_inc = -1
+        if step == 6:
+            y_axis_count = 1
+            q3_count = q3_count + 1
+
+    q3_past = q3_current
+
+
     input_path = os.path.join(input_file, filename)
     split = os.path.splitext(filename)
     new_img_ID = test_ID + '_' + str(img_save_count) + str('_3') + split[1]
@@ -153,7 +193,7 @@ for filename in os.listdir(input_file):
     max_val = np.max(corrected_img)
     min_val = np.min(corrected_img)
     print(avg_val, max_val, min_val)
-    TC1_cam = corrected_img[200, 80]
+    TC1_cam = corrected_img[230, 100]+ offset
     print('TC1', TC1_cam)
     upper_limit = TC1_cam + 0.5*full_range_temperature
     lower_limit = TC1_cam - 0.5*full_range_temperature
@@ -164,6 +204,7 @@ for filename in os.listdir(input_file):
     set_range_img[set_range_img < 0] = 255
     corrected_img = set_range_img.astype(np.uint8)
     heat_front_img = cv2.applyColorMap(corrected_img, cv2.COLORMAP_INFERNO)
+
     #heat_front_img = corrected_img
     # 008 Bottom
 
@@ -190,19 +231,46 @@ for filename in os.listdir(input_file):
     cv2.imwrite(output_front_image_path, heat_front_img)
     cv2.imwrite(output_bottom_image_path, heat_bottom_img)
 
-    if temp_img_df['Quench3 [lbloo]'] == 1:
-        bottom_y = graph_img_bottom[:, 99]
+    if temp_img_df['Quench3 [lbloo]'] == 1 and (timeStamp_current-timeStamp_past) > 9.95:
+        timeStamp_past = timeStamp_current
+        bottom_y_3 = graph_img_bottom[:, [97, 98, 99, 100, 101]]
+        bottom_y = np.average(bottom_y_3, axis=1)
         bottom_y = bottom_y - np.average(bottom_y)
-        bottom_x = np.arange(0, 600, 1)
-
+        bottom_x = np.arange(0, 30, 0.05)
+        #print(bottom_y)
         p_graph_bottom = np.poly1d(np.polyfit(bottom_x, bottom_y, 10))
+        if color_change_flag:
+            color_count = 0
+            color_change_flag = False
+            color = colors[n_lines-color_count-1]
+            time_legend = 0
+        else:
+            color_count = color_count + 1
+            color = colors[n_lines-color_count-1]
+            time_legend = time_legend+10
 
-        r = np.round(1-img_save_count/550,1)
-        g = np.round(img_save_count/1000, 1)
 
-        b = np.round(img_save_count/550, 1)
-        #plt.plot(bottom_x, p_graph_bottom(bottom_x), color=[r,g,b])
-        plt.plot(bottom_x, bottom_y, color=[r, g, b])
+
+        axis[y_axis_count, int(q3_count)].plot(bottom_x, p_graph_bottom(bottom_x),
+                                               color=color,
+                                               label = str(time_legend) + 's')
+        axis[y_axis_count, int(q3_count)].set_title('TC1.setpoint = ' + temperature_list[q3_count],
+                                                    fontdict={'fontsize': 9, 'fontweight': 'medium'})
+
+        axis[y_axis_count, int(q3_count)].tick_params(axis='both', which='major', labelsize=8)
+        axis[y_axis_count, int(q3_count)].tick_params(axis='y', which='major', labelrotation=90)
+        axis[0, 4].legend(loc='upper right', bbox_to_anchor=(1.55, 0.3))
+        #axis[0, int(q3_count)].xaxis.set_tick_params(labelbottom=True, fontdict={'fontsize': 8, 'fontweight': 'medium'})
+        #axis[y_axis_count, int(q3_count)].set_xlabel('x')
+        #figure.text(0.5, 0.04, 'Deviation from line average (Celcius)', ha='center')
+        figure.supylabel('Deviation from line average temperature (Celcius)')
+        figure.supxlabel('y-distance along center line of bottom face (mm)')
+        figure.suptitle('Temperature deviation in y-direction along bottom face. Material: ' + material)
+        #figure.text(0.04, 0.5, 'Y distance along center line of bottom face (mm)', va='center', rotation='vertical')
+        plt.ylim(-20, 20)
+        #plt.xlabel('Y distance along center line of bottom face (mm)')
+        #plt.ylabel('Deviation from line average (Celcius)')
+        #plt.plot(bottom_x, bottom_y, color=[r, g, b])
         plt_show_sec(0.01)#show for 3 sec
 
     #print(temp_img_df['Quench4 [lbloo]'])

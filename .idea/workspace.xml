@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay">
+    <list default="true" id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="Got graphs to work for bottom">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/dic_capture/PSC heating paper.py" afterDir="false" />
     </list>
@@ -214,14 +214,6 @@
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task id="LOCAL-00001" summary="camera_display True/False enables image display/save on local computer, otherwise used as a trigger and ADC">
-      <option name="closed" value="true" />
-      <created>1705406371081</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1705406371081</updated>
-    </task>
     <task active="true" id="Default" summary="Default task">
       <changelist id="3410cf3c-b08c-4524-a73d-db6f859f2ee0" name="Changes" comment="camera_display True/False enables image display/save on local computer, otherwise used as a trigger and ADC" />
       <created>1705501196468</created>
@@ -613,7 +605,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714117924460</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Got graphs to work for bottom">
+      <option name="closed" value="true" />
+      <created>1714229516420</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1714229516420</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -628,7 +628,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="formatting stuff" />
     <MESSAGE value="kind of getting the super save array to work. lots more to do" />
     <MESSAGE value="working for slow frame rates but the tf.write function is taking forever to save the data now. No idea why but I think that is the last thing that needs to be figured out." />
     <MESSAGE value="couldnt get the saving consistent with mutlithreading. Going to Try saving everything and reading from one big array" />
@@ -653,6 +652,7 @@
     <MESSAGE value="Neatened things up" />
     <MESSAGE value="Got the conversion formatting correct (iI believe)&#10;Just have to get the file organising and renaming process to work." />
     <MESSAGE value="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay" />
-    <option name="LAST_COMMIT_MESSAGE" value="Working on the PSC paper. Might be useful as a basis for pseudo calibration for temperature overlay" />
+    <MESSAGE value="Got graphs to work for bottom" />
+    <option name="LAST_COMMIT_MESSAGE" value="Got graphs to work for bottom" />
   </component>
 </project>
